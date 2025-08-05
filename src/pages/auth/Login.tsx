@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -36,6 +37,8 @@ const roleConfigs = {
 
 const Login = () => {
   const [selectedRole, setSelectedRole] = useState<keyof typeof roleConfigs>("exporter");
+  const { user, signIn } = useAuth();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
     password: ""
@@ -48,11 +51,23 @@ const Login = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement authentication logic
-    console.log("Login attempt:", { role: selectedRole, ...formData });
+    
+    const { data, error } = await signIn(formData.email, formData.password);
+    
+    if (data && !error) {
+      // Redirect based on role
+      navigate(`/dashboard/${selectedRole}`);
+    }
   };
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user) {
+      navigate('/');
+    }
+  }, [user, navigate]);
 
   const currentRoleConfig = roleConfigs[selectedRole];
   const RoleIcon = currentRoleConfig.icon;

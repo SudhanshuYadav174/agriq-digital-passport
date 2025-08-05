@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -42,6 +44,9 @@ const roleConfigs = {
 
 const Signup = () => {
   const [selectedRole, setSelectedRole] = useState<keyof typeof roleConfigs>("exporter");
+  const { signUp } = useAuth();
+  const { toast } = useToast();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     // Basic Info
     firstName: "",
@@ -78,10 +83,38 @@ const Signup = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement registration logic
-    console.log("Registration attempt:", { role: selectedRole, ...formData });
+    
+    if (formData.password !== formData.confirmPassword) {
+      toast({
+        title: "Password mismatch",
+        description: "Please make sure your passwords match.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const userData = {
+      first_name: formData.firstName,
+      last_name: formData.lastName,
+      phone: formData.phone,
+      organization_name: formData.organizationName,
+      organization_type: formData.organizationType,
+      country: formData.country,
+      address: formData.address,
+      website: formData.website,
+      role: selectedRole,
+      license_number: formData.licenseNumber,
+      certifications: formData.certifications
+    };
+
+    const { data, error } = await signUp(formData.email, formData.password, userData);
+    
+    if (data && !error) {
+      // Redirect to login or dashboard
+      navigate('/login');
+    }
   };
 
   const currentRoleConfig = roleConfigs[selectedRole];
