@@ -14,7 +14,238 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      batches: {
+        Row: {
+          batch_number: string
+          certificate_id: string | null
+          created_at: string | null
+          description: string | null
+          harvest_date: string
+          id: string
+          inspection_date: string | null
+          origin_location: string
+          processing_date: string | null
+          product_name: string
+          product_type: string
+          qa_agency_id: string | null
+          qr_code: string | null
+          quantity: number
+          status: string | null
+          unit: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          batch_number: string
+          certificate_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          harvest_date: string
+          id?: string
+          inspection_date?: string | null
+          origin_location: string
+          processing_date?: string | null
+          product_name: string
+          product_type: string
+          qa_agency_id?: string | null
+          qr_code?: string | null
+          quantity: number
+          status?: string | null
+          unit: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          batch_number?: string
+          certificate_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          harvest_date?: string
+          id?: string
+          inspection_date?: string | null
+          origin_location?: string
+          processing_date?: string | null
+          product_name?: string
+          product_type?: string
+          qa_agency_id?: string | null
+          qr_code?: string | null
+          quantity?: number
+          status?: string | null
+          unit?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      certificates: {
+        Row: {
+          batch_id: string
+          certificate_number: string
+          created_at: string | null
+          digital_signature: string | null
+          expiry_date: string
+          id: string
+          issue_date: string | null
+          issued_by: string
+          issued_to: string
+          qr_code: string
+          status: string | null
+          vc_data: Json | null
+        }
+        Insert: {
+          batch_id: string
+          certificate_number: string
+          created_at?: string | null
+          digital_signature?: string | null
+          expiry_date: string
+          id?: string
+          issue_date?: string | null
+          issued_by: string
+          issued_to: string
+          qr_code: string
+          status?: string | null
+          vc_data?: Json | null
+        }
+        Update: {
+          batch_id?: string
+          certificate_number?: string
+          created_at?: string | null
+          digital_signature?: string | null
+          expiry_date?: string
+          id?: string
+          issue_date?: string | null
+          issued_by?: string
+          issued_to?: string
+          qr_code?: string
+          status?: string | null
+          vc_data?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "certificates_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "batches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      inspections: {
+        Row: {
+          batch_id: string
+          completed_date: string | null
+          created_at: string | null
+          id: string
+          inspector_id: string
+          location: string
+          notes: string | null
+          photos: string[] | null
+          quality_score: number | null
+          scheduled_date: string
+          status: string | null
+          test_results: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          batch_id: string
+          completed_date?: string | null
+          created_at?: string | null
+          id?: string
+          inspector_id: string
+          location: string
+          notes?: string | null
+          photos?: string[] | null
+          quality_score?: number | null
+          scheduled_date: string
+          status?: string | null
+          test_results?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          batch_id?: string
+          completed_date?: string | null
+          created_at?: string | null
+          id?: string
+          inspector_id?: string
+          location?: string
+          notes?: string | null
+          photos?: string[] | null
+          quality_score?: number | null
+          scheduled_date?: string
+          status?: string | null
+          test_results?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inspections_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "batches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          address: string
+          certifications: string | null
+          country: string
+          created_at: string | null
+          email: string
+          first_name: string
+          id: string
+          last_name: string
+          license_number: string | null
+          organization_name: string
+          organization_type: string
+          phone: string | null
+          role: string
+          status: string | null
+          updated_at: string | null
+          user_id: string
+          website: string | null
+        }
+        Insert: {
+          address: string
+          certifications?: string | null
+          country: string
+          created_at?: string | null
+          email: string
+          first_name: string
+          id?: string
+          last_name: string
+          license_number?: string | null
+          organization_name: string
+          organization_type: string
+          phone?: string | null
+          role: string
+          status?: string | null
+          updated_at?: string | null
+          user_id: string
+          website?: string | null
+        }
+        Update: {
+          address?: string
+          certifications?: string | null
+          country?: string
+          created_at?: string | null
+          email?: string
+          first_name?: string
+          id?: string
+          last_name?: string
+          license_number?: string | null
+          organization_name?: string
+          organization_type?: string
+          phone?: string | null
+          role?: string
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
