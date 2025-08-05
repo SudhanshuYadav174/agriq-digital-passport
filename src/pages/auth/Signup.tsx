@@ -1,0 +1,380 @@
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Leaf, Building, Shield, Truck, User, Check } from "lucide-react";
+
+const roleConfigs = {
+  exporter: {
+    icon: Building,
+    title: "Exporter Registration",
+    description: "Register your agricultural business for quality certification",
+    color: "text-primary",
+    benefits: ["Submit batches for certification", "Track certification progress", "Download digital certificates", "Access global markets"]
+  },
+  qa_agency: {
+    icon: Shield,
+    title: "QA Agency Registration",
+    description: "Join our network of certified quality assurance agencies",
+    color: "text-secondary",
+    benefits: ["Receive inspection requests", "Schedule inspections", "Issue quality certificates", "Manage agency workflow"]
+  },
+  importer: {
+    icon: Truck,
+    title: "Importer/Customs Registration",
+    description: "Verify certificates and streamline import processes",
+    color: "text-success",
+    benefits: ["Instant certificate verification", "QR code scanning", "Import documentation", "Customs integration"]
+  },
+  admin: {
+    icon: User,
+    title: "Admin Registration",
+    description: "System administration access (approval required)",
+    color: "text-warning",
+    benefits: ["User management", "System configuration", "Audit logs", "Analytics dashboard"]
+  }
+};
+
+const Signup = () => {
+  const [selectedRole, setSelectedRole] = useState<keyof typeof roleConfigs>("exporter");
+  const [formData, setFormData] = useState({
+    // Basic Info
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    phone: "",
+    
+    // Organization Info
+    organizationName: "",
+    organizationType: "",
+    country: "",
+    address: "",
+    website: "",
+    description: "",
+    
+    // Role-specific
+    licenseNumber: "",
+    certifications: ""
+  });
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData(prev => ({
+      ...prev,
+      [e.target.name]: e.target.value
+    }));
+  };
+
+  const handleSelectChange = (field: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // TODO: Implement registration logic
+    console.log("Registration attempt:", { role: selectedRole, ...formData });
+  };
+
+  const currentRoleConfig = roleConfigs[selectedRole];
+  const RoleIcon = currentRoleConfig.icon;
+
+  return (
+    <div className="min-h-screen bg-gradient-hero py-12 px-4">
+      {/* Background Elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-white/5 rounded-full blur-xl animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-white/5 rounded-full blur-2xl animate-pulse" style={{ animationDelay: "1s" }} />
+      </div>
+
+      <div className="container mx-auto max-w-4xl relative z-10">
+        {/* Logo */}
+        <div className="text-center mb-8">
+          <Link to="/" className="inline-flex items-center space-x-2 group">
+            <div className="p-3 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20">
+              <Leaf className="h-8 w-8 text-white" />
+            </div>
+            <div className="text-left">
+              <span className="text-2xl font-bold text-white">AgriQCert</span>
+              <div className="text-sm text-white/80">Quality Certification</div>
+            </div>
+          </Link>
+        </div>
+
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* Role Selection & Benefits */}
+          <div className="lg:col-span-1">
+            <Card className="glass border-white/20 shadow-glow">
+              <CardHeader>
+                <CardTitle className="text-lg text-foreground">Choose Your Role</CardTitle>
+                <CardDescription>Select the role that best describes you</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Tabs value={selectedRole} onValueChange={(value) => setSelectedRole(value as keyof typeof roleConfigs)} orientation="vertical">
+                  <TabsList className="flex flex-col h-auto w-full">
+                    {Object.entries(roleConfigs).map(([key, config]) => {
+                      const Icon = config.icon;
+                      return (
+                        <TabsTrigger key={key} value={key} className="w-full justify-start space-x-2 p-3">
+                          <Icon className={`h-4 w-4 ${config.color}`} />
+                          <span className="text-xs">{config.title.split(' ')[0]}</span>
+                        </TabsTrigger>
+                      );
+                    })}
+                  </TabsList>
+                </Tabs>
+
+                {/* Benefits */}
+                <div className="mt-6 space-y-3">
+                  <h4 className="font-medium text-foreground">What you get:</h4>
+                  <ul className="space-y-2">
+                    {currentRoleConfig.benefits.map((benefit, index) => (
+                      <li key={index} className="flex items-start space-x-2 text-sm text-muted-foreground">
+                        <Check className="h-4 w-4 text-success mt-0.5 flex-shrink-0" />
+                        <span>{benefit}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Registration Form */}
+          <div className="lg:col-span-2">
+            <Card className="glass border-white/20 shadow-glow">
+              <CardHeader>
+                <div className="flex items-center space-x-2">
+                  <RoleIcon className={`h-6 w-6 ${currentRoleConfig.color}`} />
+                  <CardTitle className="text-xl text-foreground">{currentRoleConfig.title}</CardTitle>
+                </div>
+                <CardDescription>{currentRoleConfig.description}</CardDescription>
+              </CardHeader>
+
+              <CardContent>
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  {/* Personal Information */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-foreground">Personal Information</h3>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="firstName">First Name</Label>
+                        <Input
+                          id="firstName"
+                          name="firstName"
+                          value={formData.firstName}
+                          onChange={handleInputChange}
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="lastName">Last Name</Label>
+                        <Input
+                          id="lastName"
+                          name="lastName"
+                          value={formData.lastName}
+                          onChange={handleInputChange}
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="email">Email</Label>
+                        <Input
+                          id="email"
+                          name="email"
+                          type="email"
+                          value={formData.email}
+                          onChange={handleInputChange}
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="phone">Phone</Label>
+                        <Input
+                          id="phone"
+                          name="phone"
+                          type="tel"
+                          value={formData.phone}
+                          onChange={handleInputChange}
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="password">Password</Label>
+                        <Input
+                          id="password"
+                          name="password"
+                          type="password"
+                          value={formData.password}
+                          onChange={handleInputChange}
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="confirmPassword">Confirm Password</Label>
+                        <Input
+                          id="confirmPassword"
+                          name="confirmPassword"
+                          type="password"
+                          value={formData.confirmPassword}
+                          onChange={handleInputChange}
+                          required
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Organization Information */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-foreground">Organization Information</h3>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="organizationName">Organization Name</Label>
+                        <Input
+                          id="organizationName"
+                          name="organizationName"
+                          value={formData.organizationName}
+                          onChange={handleInputChange}
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="organizationType">Organization Type</Label>
+                        <Select value={formData.organizationType} onValueChange={(value) => handleSelectChange("organizationType", value)}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="farm">Farm</SelectItem>
+                            <SelectItem value="processor">Processor</SelectItem>
+                            <SelectItem value="exporter">Exporter</SelectItem>
+                            <SelectItem value="importer">Importer</SelectItem>
+                            <SelectItem value="agency">QA Agency</SelectItem>
+                            <SelectItem value="customs">Customs</SelectItem>
+                            <SelectItem value="other">Other</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="country">Country</Label>
+                        <Select value={formData.country} onValueChange={(value) => handleSelectChange("country", value)}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select country" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="us">United States</SelectItem>
+                            <SelectItem value="in">India</SelectItem>
+                            <SelectItem value="br">Brazil</SelectItem>
+                            <SelectItem value="cn">China</SelectItem>
+                            <SelectItem value="other">Other</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="website">Website (Optional)</Label>
+                        <Input
+                          id="website"
+                          name="website"
+                          type="url"
+                          value={formData.website}
+                          onChange={handleInputChange}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="address">Address</Label>
+                      <Textarea
+                        id="address"
+                        name="address"
+                        value={formData.address}
+                        onChange={handleInputChange}
+                        rows={3}
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  {/* Role-specific fields */}
+                  {(selectedRole === "qa_agency" || selectedRole === "admin") && (
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold text-foreground">Additional Information</h3>
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="licenseNumber">License Number</Label>
+                          <Input
+                            id="licenseNumber"
+                            name="licenseNumber"
+                            value={formData.licenseNumber}
+                            onChange={handleInputChange}
+                            required
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="certifications">Certifications</Label>
+                          <Input
+                            id="certifications"
+                            name="certifications"
+                            value={formData.certifications}
+                            onChange={handleInputChange}
+                            placeholder="e.g., ISO 9001, HACCP"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="space-y-4">
+                    <div className="flex items-center space-x-2 text-sm">
+                      <input type="checkbox" required className="rounded" />
+                      <span className="text-muted-foreground">
+                        I agree to the{" "}
+                        <Link to="/terms" className="text-primary hover:underline">
+                          Terms of Service
+                        </Link>{" "}
+                        and{" "}
+                        <Link to="/privacy" className="text-primary hover:underline">
+                          Privacy Policy
+                        </Link>
+                      </span>
+                    </div>
+
+                    <Button type="submit" variant="premium" className="w-full" size="lg">
+                      Create Account
+                    </Button>
+                  </div>
+
+                  <div className="text-center text-sm text-muted-foreground">
+                    Already have an account?{" "}
+                    <Link to="/login" className="text-primary hover:underline font-medium">
+                      Sign in here
+                    </Link>
+                  </div>
+                </form>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Signup;
