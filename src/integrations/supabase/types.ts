@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      audit_logs: {
+        Row: {
+          action: string
+          id: string
+          ip_address: string | null
+          new_values: Json | null
+          old_values: Json | null
+          resource_id: string | null
+          resource_type: string
+          session_id: string | null
+          timestamp: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          id?: string
+          ip_address?: string | null
+          new_values?: Json | null
+          old_values?: Json | null
+          resource_id?: string | null
+          resource_type: string
+          session_id?: string | null
+          timestamp?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          id?: string
+          ip_address?: string | null
+          new_values?: Json | null
+          old_values?: Json | null
+          resource_id?: string | null
+          resource_type?: string
+          session_id?: string | null
+          timestamp?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       batches: {
         Row: {
           batch_number: string
@@ -130,6 +172,75 @@ export type Database = {
           },
         ]
       }
+      documents: {
+        Row: {
+          access_level: string
+          batch_id: string | null
+          certificate_id: string | null
+          checksum: string | null
+          created_at: string
+          description: string | null
+          document_type: string
+          file_name: string
+          file_size: number | null
+          file_type: string | null
+          id: string
+          inspection_id: string | null
+          organization_id: string | null
+          status: string
+          storage_path: string | null
+          tags: string[] | null
+          title: string
+          updated_at: string
+          uploaded_by: string
+          version: number | null
+        }
+        Insert: {
+          access_level?: string
+          batch_id?: string | null
+          certificate_id?: string | null
+          checksum?: string | null
+          created_at?: string
+          description?: string | null
+          document_type: string
+          file_name: string
+          file_size?: number | null
+          file_type?: string | null
+          id?: string
+          inspection_id?: string | null
+          organization_id?: string | null
+          status?: string
+          storage_path?: string | null
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+          uploaded_by: string
+          version?: number | null
+        }
+        Update: {
+          access_level?: string
+          batch_id?: string | null
+          certificate_id?: string | null
+          checksum?: string | null
+          created_at?: string
+          description?: string | null
+          document_type?: string
+          file_name?: string
+          file_size?: number | null
+          file_type?: string | null
+          id?: string
+          inspection_id?: string | null
+          organization_id?: string | null
+          status?: string
+          storage_path?: string | null
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+          uploaded_by?: string
+          version?: number | null
+        }
+        Relationships: []
+      }
       inspections: {
         Row: {
           batch_id: string
@@ -182,6 +293,179 @@ export type Database = {
             columns: ["batch_id"]
             isOneToOne: false
             referencedRelation: "batches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          action_url: string | null
+          category: string
+          created_at: string
+          data: Json | null
+          expires_at: string | null
+          id: string
+          message: string
+          read: boolean | null
+          read_at: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          action_url?: string | null
+          category: string
+          created_at?: string
+          data?: Json | null
+          expires_at?: string | null
+          id?: string
+          message: string
+          read?: boolean | null
+          read_at?: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          action_url?: string | null
+          category?: string
+          created_at?: string
+          data?: Json | null
+          expires_at?: string | null
+          id?: string
+          message?: string
+          read?: boolean | null
+          read_at?: string | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      organizations: {
+        Row: {
+          accreditation_body: string | null
+          accreditation_expiry: string | null
+          accreditation_number: string | null
+          address: string
+          certifications: string[] | null
+          city: string
+          country: string
+          created_at: string
+          description: string | null
+          email: string | null
+          id: string
+          license_number: string | null
+          name: string
+          phone: string | null
+          postal_code: string | null
+          registration_number: string | null
+          state: string | null
+          status: string
+          type: string
+          updated_at: string
+          user_id: string
+          website: string | null
+        }
+        Insert: {
+          accreditation_body?: string | null
+          accreditation_expiry?: string | null
+          accreditation_number?: string | null
+          address: string
+          certifications?: string[] | null
+          city: string
+          country: string
+          created_at?: string
+          description?: string | null
+          email?: string | null
+          id?: string
+          license_number?: string | null
+          name: string
+          phone?: string | null
+          postal_code?: string | null
+          registration_number?: string | null
+          state?: string | null
+          status?: string
+          type: string
+          updated_at?: string
+          user_id: string
+          website?: string | null
+        }
+        Update: {
+          accreditation_body?: string | null
+          accreditation_expiry?: string | null
+          accreditation_number?: string | null
+          address?: string
+          certifications?: string[] | null
+          city?: string
+          country?: string
+          created_at?: string
+          description?: string | null
+          email?: string | null
+          id?: string
+          license_number?: string | null
+          name?: string
+          phone?: string | null
+          postal_code?: string | null
+          registration_number?: string | null
+          state?: string | null
+          status?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
+      product_categories: {
+        Row: {
+          code: string
+          created_at: string
+          description: string | null
+          hs_code: string | null
+          id: string
+          name: string
+          organic_eligible: boolean | null
+          parent_id: string | null
+          shelf_life_days: number | null
+          special_handling: string[] | null
+          storage_requirements: string | null
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          description?: string | null
+          hs_code?: string | null
+          id?: string
+          name: string
+          organic_eligible?: boolean | null
+          parent_id?: string | null
+          shelf_life_days?: number | null
+          special_handling?: string[] | null
+          storage_requirements?: string | null
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          description?: string | null
+          hs_code?: string | null
+          id?: string
+          name?: string
+          organic_eligible?: boolean | null
+          parent_id?: string | null
+          shelf_life_days?: number | null
+          special_handling?: string[] | null
+          storage_requirements?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_product_categories_parent_id"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "product_categories"
             referencedColumns: ["id"]
           },
         ]
@@ -245,6 +529,228 @@ export type Database = {
           website?: string | null
         }
         Relationships: []
+      }
+      quality_standards: {
+        Row: {
+          category: string
+          code: string
+          created_at: string
+          description: string | null
+          id: string
+          issuing_body: string
+          name: string
+          renewal_required: boolean | null
+          status: string
+          test_parameters: Json | null
+          updated_at: string
+          validity_period_days: number | null
+          version: string
+        }
+        Insert: {
+          category: string
+          code: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          issuing_body: string
+          name: string
+          renewal_required?: boolean | null
+          status?: string
+          test_parameters?: Json | null
+          updated_at?: string
+          validity_period_days?: number | null
+          version?: string
+        }
+        Update: {
+          category?: string
+          code?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          issuing_body?: string
+          name?: string
+          renewal_required?: boolean | null
+          status?: string
+          test_parameters?: Json | null
+          updated_at?: string
+          validity_period_days?: number | null
+          version?: string
+        }
+        Relationships: []
+      }
+      shipments: {
+        Row: {
+          actual_arrival: string | null
+          actual_departure: string | null
+          batch_id: string
+          container_number: string | null
+          created_at: string
+          estimated_arrival: string | null
+          estimated_departure: string | null
+          exporter_id: string
+          id: string
+          importer_id: string
+          port_of_discharge: string
+          port_of_loading: string
+          seal_number: string | null
+          shipping_company: string | null
+          special_instructions: string | null
+          status: string
+          temperature_controlled: boolean | null
+          temperature_range: string | null
+          tracking_number: string | null
+          updated_at: string
+          vessel_name: string | null
+          voyage_number: string | null
+        }
+        Insert: {
+          actual_arrival?: string | null
+          actual_departure?: string | null
+          batch_id: string
+          container_number?: string | null
+          created_at?: string
+          estimated_arrival?: string | null
+          estimated_departure?: string | null
+          exporter_id: string
+          id?: string
+          importer_id: string
+          port_of_discharge: string
+          port_of_loading: string
+          seal_number?: string | null
+          shipping_company?: string | null
+          special_instructions?: string | null
+          status?: string
+          temperature_controlled?: boolean | null
+          temperature_range?: string | null
+          tracking_number?: string | null
+          updated_at?: string
+          vessel_name?: string | null
+          voyage_number?: string | null
+        }
+        Update: {
+          actual_arrival?: string | null
+          actual_departure?: string | null
+          batch_id?: string
+          container_number?: string | null
+          created_at?: string
+          estimated_arrival?: string | null
+          estimated_departure?: string | null
+          exporter_id?: string
+          id?: string
+          importer_id?: string
+          port_of_discharge?: string
+          port_of_loading?: string
+          seal_number?: string | null
+          shipping_company?: string | null
+          special_instructions?: string | null
+          status?: string
+          temperature_controlled?: boolean | null
+          temperature_range?: string | null
+          tracking_number?: string | null
+          updated_at?: string
+          vessel_name?: string | null
+          voyage_number?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_shipments_batch_id"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "batches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      test_results: {
+        Row: {
+          attachments: string[] | null
+          batch_id: string
+          comments: string | null
+          completion_date: string | null
+          created_at: string
+          equipment_used: string | null
+          id: string
+          inspection_id: string | null
+          laboratory_id: string | null
+          methodology: string | null
+          parameters: Json
+          pass_fail: string | null
+          review_date: string | null
+          reviewed_by: string | null
+          standard_id: string | null
+          status: string
+          technician_id: string | null
+          test_date: string
+          test_type: string
+          updated_at: string
+        }
+        Insert: {
+          attachments?: string[] | null
+          batch_id: string
+          comments?: string | null
+          completion_date?: string | null
+          created_at?: string
+          equipment_used?: string | null
+          id?: string
+          inspection_id?: string | null
+          laboratory_id?: string | null
+          methodology?: string | null
+          parameters: Json
+          pass_fail?: string | null
+          review_date?: string | null
+          reviewed_by?: string | null
+          standard_id?: string | null
+          status?: string
+          technician_id?: string | null
+          test_date: string
+          test_type: string
+          updated_at?: string
+        }
+        Update: {
+          attachments?: string[] | null
+          batch_id?: string
+          comments?: string | null
+          completion_date?: string | null
+          created_at?: string
+          equipment_used?: string | null
+          id?: string
+          inspection_id?: string | null
+          laboratory_id?: string | null
+          methodology?: string | null
+          parameters?: Json
+          pass_fail?: string | null
+          review_date?: string | null
+          reviewed_by?: string | null
+          standard_id?: string | null
+          status?: string
+          technician_id?: string | null
+          test_date?: string
+          test_type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_test_results_batch_id"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "batches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_test_results_inspection_id"
+            columns: ["inspection_id"]
+            isOneToOne: false
+            referencedRelation: "inspections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_test_results_standard_id"
+            columns: ["standard_id"]
+            isOneToOne: false
+            referencedRelation: "quality_standards"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
