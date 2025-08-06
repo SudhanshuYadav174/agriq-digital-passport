@@ -152,6 +152,7 @@ const VerifyCertificate = () => {
                   onClick={handleVerification}
                   disabled={!certificateId.trim() || isVerifying}
                   className="min-w-[120px]"
+                  variant="default"
                 >
                   {isVerifying ? "Verifying..." : "Verify"}
                 </Button>

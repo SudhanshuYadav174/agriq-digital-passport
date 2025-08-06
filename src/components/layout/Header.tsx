@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Leaf, Shield, QrCode, LogOut, User } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
@@ -83,8 +84,10 @@ const Header = () => {
             ))}
           </nav>
 
-          {/* Action Buttons */}
+          
+          {/* Right section - Theme Toggle + Auth */}
           <div className="hidden md:flex items-center space-x-4">
+            <ThemeToggle />
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -150,6 +153,9 @@ const Header = () => {
                 </Link>
               ))}
               <div className="pt-4 pb-2 border-t border-border">
+                <div className="flex items-center justify-between mb-3">
+                  <ThemeToggle />
+                </div>
                 <div className="space-y-2">
                   <Button 
                     variant="ghost" 
