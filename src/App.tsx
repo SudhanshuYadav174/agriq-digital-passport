@@ -25,6 +25,7 @@ import AdminDashboard from "./pages/dashboards/AdminDashboard";
 import VerifyCertificate from "./pages/VerifyCertificate";
 import Support from "./pages/Support";
 import NotFound from "./pages/NotFound";
+import NewSubmission from "./pages/NewSubmission";
 
 const queryClient = new QueryClient();
 
@@ -55,6 +56,7 @@ const App = () => (
             <Route path="terms" element={<Terms />} />
             <Route path="verify" element={<VerifyCertificate />} />
             <Route path="support" element={<Support />} />
+            <Route path="submit" element={<NewSubmission />} />
             
             {/* Dashboard Routes */}
             <Route path="dashboard/exporter" element={<ExporterDashboard />} />

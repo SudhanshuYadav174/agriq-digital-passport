@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { ArrowRight, Shield, Leaf, Globe, QrCode } from "lucide-react";
+import { ParticleBackground } from "@/components/ui/particle-background";
 
 const HeroSection = () => {
   const heroRef = useRef<HTMLDivElement>(null);
@@ -28,6 +29,7 @@ const HeroSection = () => {
 
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden">
+      <ParticleBackground particleCount={80} speed={0.0003} />
       {/* Background with gradient */}
       <div className="absolute inset-0 bg-gradient-hero opacity-90" />
       

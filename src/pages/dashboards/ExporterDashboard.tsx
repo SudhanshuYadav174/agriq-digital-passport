@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -151,8 +152,8 @@ const ExporterDashboard = () => {
                 <CardDescription>Start the certification process for a new product batch</CardDescription>
               </CardHeader>
               <CardContent>
-                <Button variant="agri" className="w-full">
-                  Create Submission
+                <Button variant="agri" className="w-full" asChild>
+                  <Link to="/submit">Create Submission</Link>
                 </Button>
               </CardContent>
             </Card>
