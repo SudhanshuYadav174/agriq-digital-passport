@@ -68,16 +68,16 @@ const HeroSection = () => {
 
             {/* CTAs */}
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button variant="glass" size="xl" asChild className="group">
+              <Button variant="trial" size="xl" asChild className="group">
                 <Link to="/signup">
-                  Start Certification
+                  Start Free Trial
                   <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </Button>
-              <Button variant="outline" size="xl" asChild className="border-white/30 text-white hover:bg-white/10">
+              <Button variant="glass" size="xl" asChild className="group">
                 <Link to="/verify">
                   Verify Certificate
-                  <QrCode className="ml-2 h-5 w-5" />
+                  <QrCode className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </Button>
             </div>

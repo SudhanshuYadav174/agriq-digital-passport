@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { ParticleBackground } from "@/components/ui/particle-background";
 
 const VerifyCertificate = () => {
   const [certificateId, setCertificateId] = useState("");
@@ -111,8 +112,9 @@ const VerifyCertificate = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-subtle py-12">
-      <div className="container mx-auto px-4 max-w-4xl">
+    <div className="min-h-screen bg-gradient-subtle py-12 relative">
+      <ParticleBackground particleCount={50} speed={0.0002} />
+      <div className="container mx-auto px-4 max-w-4xl relative z-10">
         {/* Header */}
         <div className="text-center mb-12">
           <div className="inline-flex items-center justify-center p-3 bg-primary/10 rounded-full mb-4">

@@ -23,7 +23,8 @@ const buttonVariants = cva(
         hero: "bg-gradient-hero text-white shadow-medium hover:shadow-glow hover:scale-105 transition-all duration-300 font-semibold",
         success: "bg-success text-success-foreground shadow-soft hover:bg-success/90 hover:shadow-medium",
         warning: "bg-warning text-warning-foreground shadow-soft hover:bg-warning/90 hover:shadow-medium",
-        glass: "glass text-foreground hover:bg-white/90 border border-white/30",
+        glass: "backdrop-blur-sm bg-white/20 border border-white/20 text-white hover:bg-white/30 hover:border-white/30 shadow-lg dark:bg-white/10 dark:border-white/10 dark:hover:bg-white/20",
+        trial: "bg-gradient-primary text-primary-foreground hover:opacity-90 shadow-medium hover:shadow-strong transition-all duration-300",
         premium: "bg-gradient-to-r from-primary via-primary-light to-secondary text-white shadow-glow hover:shadow-strong hover:scale-105 transition-all duration-300 font-semibold",
       },
       size: {

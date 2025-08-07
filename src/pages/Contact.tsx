@@ -1,7 +1,10 @@
+import { ParticleBackground } from "@/components/ui/particle-background";
+
 const ContactPage = () => {
   return (
-    <div className="min-h-screen py-24">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen py-24 relative">
+      <ParticleBackground particleCount={35} speed={0.0001} />
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
             Contact Us

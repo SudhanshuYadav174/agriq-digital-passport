@@ -47,25 +47,20 @@ const NewSubmission = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background relative">
-      <ParticleBackground particleCount={100} speed={0.0005} />
-      
-      <div className="relative z-10 container mx-auto px-4 py-20">
-        <div className="text-center mb-8 animate-fade-in">
-          <h1 className="text-4xl font-bold text-foreground mb-4">
-            Create New Submission
-          </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Submit your agricultural product batch for quality certification
+    <div className="min-h-screen bg-muted/30 py-8 relative">
+      <ParticleBackground particleCount={30} speed={0.0001} />
+      <div className="container mx-auto px-4 max-w-4xl relative z-10">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold mb-4">Create New Submission</h1>
+          <p className="text-muted-foreground">
+            Submit your agricultural product for quality certification
           </p>
         </div>
-
-        <div className="animate-slide-up">
-          <SubmissionForm 
-            onSubmit={handleSubmission}
-            isLoading={isLoading}
-          />
-        </div>
+        
+        <SubmissionForm 
+          onSubmit={handleSubmission}
+          isLoading={isLoading}
+        />
       </div>
     </div>
   );

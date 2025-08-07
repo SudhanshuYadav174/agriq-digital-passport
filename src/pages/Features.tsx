@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
+import { ParticleBackground } from "@/components/ui/particle-background";
 
 const featuresData = [
   {
@@ -69,8 +70,9 @@ const comparisonData = [
 
 const Features = () => {
   return (
-    <div className="min-h-screen py-24">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen py-24 relative">
+      <ParticleBackground particleCount={60} speed={0.0002} />
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Hero Section */}
         <div className="text-center mb-16 space-y-6">
           <div className="inline-flex items-center px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium">
