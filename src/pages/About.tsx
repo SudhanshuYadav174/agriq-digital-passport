@@ -1,4 +1,7 @@
 import { ParticleBackground } from "@/components/ui/particle-background";
+import sudhanshutAvatar from "@/assets/sudhanshu-avatar.png";
+import namanAvatar from "@/assets/naman-avatar.png";
+import harshAvatar from "@/assets/harsh-avatar.png";
 
 const AboutPage = () => {
   return (
@@ -63,23 +66,32 @@ const AboutPage = () => {
             <div className="grid md:grid-cols-3 gap-6">
               {[
                 {
-                  name: "Sarah Johnson",
+                  name: "Sudhanshu Yadav",
                   position: "CEO & Co-Founder",
-                  background: "Former USDA agricultural inspector with 15+ years experience"
+                  background: "Agricultural technology expert with 10+ years experience",
+                  avatar: sudhanshutAvatar
                 },
                 {
-                  name: "Michael Chen",
+                  name: "Naman Sharma",
                   position: "CTO & Co-Founder", 
-                  background: "Blockchain engineer and former Google software architect"
+                  background: "Full-stack developer and blockchain specialist",
+                  avatar: namanAvatar
                 },
                 {
-                  name: "Dr. Elena Rodriguez",
+                  name: "Harsh Vardhan Singh",
                   position: "Chief Quality Officer",
-                  background: "PhD in Food Science, former FDA consultant"
+                  background: "Quality assurance and certification expert",
+                  avatar: harshAvatar
                 }
               ].map((member, index) => (
                 <div key={index} className="text-center">
-                  <div className="w-24 h-24 bg-gradient-primary rounded-full mx-auto mb-4"></div>
+                  <div className="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden border-2 border-primary/20">
+                    <img 
+                      src={member.avatar} 
+                      alt={member.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
                   <h4 className="font-semibold text-lg">{member.name}</h4>
                   <p className="text-primary font-medium text-sm mb-2">{member.position}</p>
                   <p className="text-muted-foreground text-sm">{member.background}</p>

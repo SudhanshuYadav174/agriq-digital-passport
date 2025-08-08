@@ -211,9 +211,11 @@ const Signup = () => {
                         <Input
                           id="firstName"
                           name="firstName"
+                          placeholder="Enter your first name"
                           value={formData.firstName}
                           onChange={handleInputChange}
                           required
+                          className="placeholder:text-muted-foreground/60"
                         />
                       </div>
                       <div className="space-y-2">
@@ -221,9 +223,11 @@ const Signup = () => {
                         <Input
                           id="lastName"
                           name="lastName"
+                          placeholder="Enter your last name"
                           value={formData.lastName}
                           onChange={handleInputChange}
                           required
+                          className="placeholder:text-muted-foreground/60"
                         />
                       </div>
                     </div>
@@ -235,9 +239,11 @@ const Signup = () => {
                           id="email"
                           name="email"
                           type="email"
+                          placeholder="Enter your email address"
                           value={formData.email}
                           onChange={handleInputChange}
                           required
+                          className="placeholder:text-muted-foreground/60"
                         />
                       </div>
                       <div className="space-y-2">
@@ -246,9 +252,11 @@ const Signup = () => {
                           id="phone"
                           name="phone"
                           type="tel"
+                          placeholder="Enter your phone number"
                           value={formData.phone}
                           onChange={handleInputChange}
                           required
+                          className="placeholder:text-muted-foreground/60"
                         />
                       </div>
                     </div>
@@ -260,9 +268,11 @@ const Signup = () => {
                           id="password"
                           name="password"
                           type="password"
+                          placeholder="Create a strong password"
                           value={formData.password}
                           onChange={handleInputChange}
                           required
+                          className="placeholder:text-muted-foreground/60"
                         />
                       </div>
                       <div className="space-y-2">
@@ -271,9 +281,11 @@ const Signup = () => {
                           id="confirmPassword"
                           name="confirmPassword"
                           type="password"
+                          placeholder="Confirm your password"
                           value={formData.confirmPassword}
                           onChange={handleInputChange}
                           required
+                          className="placeholder:text-muted-foreground/60"
                         />
                       </div>
                     </div>

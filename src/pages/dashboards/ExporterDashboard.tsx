@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useBatches } from "@/hooks/useBatches";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,24 +18,40 @@ import {
   BarChart3,
   TrendingUp
 } from "lucide-react";
+import AnalyticsCharts from "@/components/analytics/AnalyticsCharts";
 
 const ExporterDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
+  const { batches, loading } = useBatches();
 
-  // Mock data
+  // Calculate stats from real data
+  const totalBatches = batches.length;
+  const certifiedBatches = batches.filter(b => b.status === 'certified').length;
+  const pendingBatches = batches.filter(b => b.status === 'pending' || b.status === 'submitted').length;
+  const inspectionBatches = batches.filter(b => b.status === 'inspection').length;
+
   const stats = [
-    { title: "Total Batches", value: "156", change: "+12%", icon: Package, color: "text-primary" },
-    { title: "Pending Certification", value: "23", change: "+3%", icon: Clock, color: "text-warning" },
-    { title: "Certified Batches", value: "98", change: "+18%", icon: CheckCircle, color: "text-success" },
+    { title: "Total Batches", value: totalBatches.toString(), change: "+12%", icon: Package, color: "text-primary" },
+    { title: "Pending Certification", value: pendingBatches.toString(), change: "+3%", icon: Clock, color: "text-warning" },
+    { title: "Certified Batches", value: certifiedBatches.toString(), change: "+18%", icon: CheckCircle, color: "text-success" },
     { title: "Export Value", value: "$2.4M", change: "+25%", icon: TrendingUp, color: "text-secondary" }
   ];
 
-  const recentBatches = [
-    { id: "AGR-2024-001", product: "Premium Organic Rice", status: "certified", date: "2024-12-15", progress: 100 },
-    { id: "AGR-2024-002", product: "Basmati Rice Grade A", status: "inspection", date: "2024-12-14", progress: 75 },
-    { id: "AGR-2024-003", product: "Quinoa Organic", status: "submitted", date: "2024-12-13", progress: 25 },
-    { id: "AGR-2024-004", product: "Wheat Premium", status: "pending", date: "2024-12-12", progress: 0 }
-  ];
+  // Get recent batches from real data
+  const recentBatches = batches.slice(0, 4).map(batch => {
+    const progress = batch.status === 'certified' ? 100 
+      : batch.status === 'inspection' ? 75 
+      : batch.status === 'submitted' ? 25 
+      : 0;
+      
+    return {
+      id: batch.batch_number,
+      product: batch.product_name,
+      status: batch.status,
+      date: new Date(batch.created_at).toLocaleDateString(),
+      progress
+    };
+  });
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -208,18 +225,19 @@ const ExporterDashboard = () => {
         </TabsContent>
 
         <TabsContent value="analytics">
-          <Card>
-            <CardHeader>
-              <CardTitle>Analytics & Reports</CardTitle>
-              <CardDescription>Insights into your certification performance</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-8 text-muted-foreground">
-                <BarChart3 className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>Analytics dashboard coming soon...</p>
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-bold">Analytics Dashboard</h2>
+                <p className="text-muted-foreground">Real-time insights into your certification performance</p>
               </div>
-            </CardContent>
-          </Card>
+              <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+                <div className="w-2 h-2 bg-success rounded-full animate-pulse"></div>
+                <span>Live data</span>
+              </div>
+            </div>
+            <AnalyticsCharts />
+          </div>
         </TabsContent>
       </Tabs>
     </div>

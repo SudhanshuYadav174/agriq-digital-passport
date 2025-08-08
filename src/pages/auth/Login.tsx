@@ -141,6 +141,7 @@ const Login = () => {
                   value={formData.email}
                   onChange={handleInputChange}
                   required
+                  className="placeholder:text-muted-foreground/60"
                 />
               </div>
               
@@ -154,6 +155,7 @@ const Login = () => {
                   value={formData.password}
                   onChange={handleInputChange}
                   required
+                  className="placeholder:text-muted-foreground/60"
                 />
               </div>
 

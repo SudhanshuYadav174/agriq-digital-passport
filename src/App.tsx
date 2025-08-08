@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import MainLayout from "./components/layout/MainLayout";
+import AuthGuard from "./components/ui/AuthGuard";
 import Index from "./pages/Index";
 import Features from "./pages/Features";
 import Pricing from "./pages/Pricing";
@@ -56,7 +57,7 @@ const App = () => (
             <Route path="terms" element={<Terms />} />
             <Route path="verify" element={<VerifyCertificate />} />
             <Route path="support" element={<Support />} />
-            <Route path="submit" element={<NewSubmission />} />
+            <Route path="submit" element={<AuthGuard><NewSubmission /></AuthGuard>} />
             
             {/* Dashboard Routes */}
             <Route path="dashboard/exporter" element={<ExporterDashboard />} />
