@@ -94,7 +94,7 @@ const HeroSection = () => {
               </div>
               <div className="text-center">
                 <div className="text-2xl md:text-3xl font-bold text-white">99.9%</div>
-                <div className="text-sm text-white/70">Verification Rate</div>
+                <div className="text-sm text-white/70">Verification Rate</div>  
               </div>
             </div>
           </div>
@@ -105,7 +105,7 @@ const HeroSection = () => {
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-success rounded-lg flex items-center justify-center">
+                    <div className="w-10 h-10 bg-primary dark:bg-primary rounded-lg flex items-center justify-center">
                       <Leaf className="h-5 w-5 text-white" />
                     </div>
                     <div>
@@ -113,7 +113,7 @@ const HeroSection = () => {
                       <div className="text-white/70 text-sm">Premium Organic Rice</div>
                     </div>
                   </div>
-                  <div className="px-3 py-1 bg-success/20 text-success-foreground rounded-full text-xs font-medium">
+                  <div className="px-3 py-1 bg-primary/20 text-white rounded-full text-xs font-medium">
                     Verified ✓
                   </div>
                 </div>

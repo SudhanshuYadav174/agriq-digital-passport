@@ -10,6 +10,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Leaf, Building, Shield, Truck, User, Check } from "lucide-react";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { ParticleBackground } from "@/components/ui/particle-background";
 
 const roleConfigs = {
   exporter: {
@@ -121,11 +123,17 @@ const Signup = () => {
   const RoleIcon = currentRoleConfig.icon;
 
   return (
-    <div className="min-h-screen bg-gradient-hero py-12 px-4">
+    <div className="min-h-screen bg-gradient-hero py-12 px-4 relative">
+      <ParticleBackground particleCount={50} speed={0.0002} />
       {/* Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-white/5 rounded-full blur-xl animate-pulse" />
         <div className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-white/5 rounded-full blur-2xl animate-pulse" style={{ animationDelay: "1s" }} />
+      </div>
+      
+      {/* Theme Toggle */}
+      <div className="absolute top-4 right-4 z-20">
+        <ThemeToggle />
       </div>
 
       <div className="container mx-auto max-w-4xl relative z-10">
@@ -145,9 +153,9 @@ const Signup = () => {
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Role Selection & Benefits */}
           <div className="lg:col-span-1">
-            <Card className="glass border-white/20 shadow-glow">
+            <Card className="glass border-white/20 shadow-glow bg-card/95 backdrop-blur-md">
               <CardHeader>
-                <CardTitle className="text-lg text-foreground">Choose Your Role</CardTitle>
+                <CardTitle className="text-lg text-card-foreground">Choose Your Role</CardTitle>
                 <CardDescription>Select the role that best describes you</CardDescription>
               </CardHeader>
               <CardContent>
@@ -167,7 +175,7 @@ const Signup = () => {
 
                 {/* Benefits */}
                 <div className="mt-6 space-y-3">
-                  <h4 className="font-medium text-foreground">What you get:</h4>
+                  <h4 className="font-medium text-card-foreground">What you get:</h4>
                   <ul className="space-y-2">
                     {currentRoleConfig.benefits.map((benefit, index) => (
                       <li key={index} className="flex items-start space-x-2 text-sm text-muted-foreground">
@@ -183,11 +191,11 @@ const Signup = () => {
 
           {/* Registration Form */}
           <div className="lg:col-span-2">
-            <Card className="glass border-white/20 shadow-glow">
+            <Card className="glass border-white/20 shadow-glow bg-card/95 backdrop-blur-md">
               <CardHeader>
                 <div className="flex items-center space-x-2">
                   <RoleIcon className={`h-6 w-6 ${currentRoleConfig.color}`} />
-                  <CardTitle className="text-xl text-foreground">{currentRoleConfig.title}</CardTitle>
+                  <CardTitle className="text-xl text-card-foreground">{currentRoleConfig.title}</CardTitle>
                 </div>
                 <CardDescription>{currentRoleConfig.description}</CardDescription>
               </CardHeader>
@@ -196,7 +204,7 @@ const Signup = () => {
                 <form onSubmit={handleSubmit} className="space-y-6">
                   {/* Personal Information */}
                   <div className="space-y-4">
-                    <h3 className="text-lg font-semibold text-foreground">Personal Information</h3>
+                    <h3 className="text-lg font-semibold text-card-foreground">Personal Information</h3>
                     <div className="grid md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="firstName">First Name</Label>
@@ -273,7 +281,7 @@ const Signup = () => {
 
                   {/* Organization Information */}
                   <div className="space-y-4">
-                    <h3 className="text-lg font-semibold text-foreground">Organization Information</h3>
+                    <h3 className="text-lg font-semibold text-card-foreground">Organization Information</h3>
                     <div className="grid md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="organizationName">Organization Name</Label>
@@ -348,7 +356,7 @@ const Signup = () => {
                   {/* Role-specific fields */}
                   {(selectedRole === "qa_agency" || selectedRole === "admin") && (
                     <div className="space-y-4">
-                      <h3 className="text-lg font-semibold text-foreground">Additional Information</h3>
+                      <h3 className="text-lg font-semibold text-card-foreground">Additional Information</h3>
                       <div className="grid md:grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <Label htmlFor="licenseNumber">License Number</Label>

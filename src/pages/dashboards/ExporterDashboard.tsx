@@ -62,9 +62,11 @@ const ExporterDashboard = () => {
           <h1 className="text-3xl font-bold text-foreground">Exporter Dashboard</h1>
           <p className="text-muted-foreground mt-1">Manage your agricultural product certifications</p>
         </div>
-        <Button variant="agri" size="lg" className="group">
-          <Plus className="h-5 w-5 mr-2 group-hover:rotate-90 transition-transform" />
-          Submit New Batch
+        <Button variant="agri" size="lg" className="group" asChild>
+          <Link to="/submit">
+            <Plus className="h-5 w-5 mr-2 group-hover:rotate-90 transition-transform" />
+            Submit New Batch
+          </Link>
         </Button>
       </div>
 
