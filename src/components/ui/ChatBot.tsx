@@ -90,9 +90,9 @@ const ChatBot = () => {
       {/* Chat Window */}
       {isOpen && (
         <div className="fixed bottom-24 right-6 z-40 w-80 h-96">
-          <Card className="h-full glass border-primary/20 shadow-glow bg-card/95 backdrop-blur-md">
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center space-x-2 text-lg">
+          <Card className="h-full glass border-border/20 shadow-glow bg-background/95 backdrop-blur-md">
+            <CardHeader className="pb-3 border-b border-border/20">
+              <CardTitle className="flex items-center space-x-2 text-lg text-foreground">
                 <Bot className="h-5 w-5 text-primary" />
                 <span>AgriQCert Assistant</span>
               </CardTitle>
@@ -100,7 +100,7 @@ const ChatBot = () => {
             <CardContent className="flex flex-col h-full p-0">
               {/* Messages */}
               <ScrollArea className="flex-1 px-4">
-                <div className="space-y-3 pb-4">
+                <div className="space-y-3 pb-4 pt-4">
                   {messages.map((message) => (
                     <div
                       key={message.id}
@@ -109,12 +109,12 @@ const ChatBot = () => {
                       <div
                         className={`max-w-[80%] rounded-lg p-3 ${
                           message.isBot
-                            ? "bg-muted text-foreground"
+                            ? "bg-muted/80 text-foreground border border-border/20"
                             : "bg-primary text-primary-foreground"
                         }`}
                       >
                         <div className="flex items-start space-x-2">
-                          {message.isBot && <Bot className="h-4 w-4 mt-0.5 flex-shrink-0" />}
+                          {message.isBot && <Bot className="h-4 w-4 mt-0.5 flex-shrink-0 text-primary" />}
                           {!message.isBot && <User className="h-4 w-4 mt-0.5 flex-shrink-0" />}
                           <div className="text-sm whitespace-pre-line">{message.text}</div>
                         </div>
@@ -125,14 +125,14 @@ const ChatBot = () => {
               </ScrollArea>
 
               {/* Input */}
-              <div className="p-4 border-t border-border">
+              <div className="p-4 border-t border-border/20 bg-background/50">
                 <div className="flex space-x-2">
                   <Input
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
                     onKeyPress={handleKeyPress}
                     placeholder="Type your message..."
-                    className="flex-1 text-sm"
+                    className="flex-1 text-sm bg-background/80 border-border/40 text-foreground placeholder:text-muted-foreground/60"
                   />
                   <Button
                     onClick={handleSendMessage}

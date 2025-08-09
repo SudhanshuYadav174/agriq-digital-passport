@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { ParticleBackground } from "@/components/ui/particle-background";
 import { 
   Users, 
   Shield, 
@@ -65,7 +66,9 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 space-y-8">
+    <div className="min-h-screen bg-gradient-subtle relative">
+      <ParticleBackground particleCount={30} speed={0.0001} />
+      <div className="container mx-auto px-4 py-8 space-y-8 relative z-10">
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
         <div>
@@ -312,6 +315,7 @@ const AdminDashboard = () => {
           </Card>
         </TabsContent>
       </Tabs>
+      </div>
     </div>
   );
 };

@@ -129,10 +129,21 @@ const Login = () => {
               </TabsList>
             </Tabs>
 
+            {/* Demo Account Info */}
+            <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 mb-4">
+              <h4 className="text-sm font-medium text-foreground mb-2">Demo Account Credentials:</h4>
+              <div className="text-xs space-y-1 text-muted-foreground">
+                <div>• Exporter: demo.exporter@agriqcert.com / password123</div>
+                <div>• QA Agency: demo.qa@agriqcert.com / password123</div>
+                <div>• Importer: demo.importer@agriqcert.com / password123</div>
+                <div>• Admin: demo.admin@agriqcert.com / password123</div>
+              </div>
+            </div>
+
             {/* Login Form */}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email" className="text-foreground">Email</Label>
                 <Input
                   id="email"
                   name="email"
@@ -141,12 +152,12 @@ const Login = () => {
                   value={formData.email}
                   onChange={handleInputChange}
                   required
-                  className="placeholder:text-muted-foreground/60"
+                  className="bg-background/50 border-border text-foreground placeholder:text-muted-foreground/60"
                 />
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password" className="text-foreground">Password</Label>
                 <Input
                   id="password"
                   name="password"
@@ -155,7 +166,7 @@ const Login = () => {
                   value={formData.password}
                   onChange={handleInputChange}
                   required
-                  className="placeholder:text-muted-foreground/60"
+                  className="bg-background/50 border-border text-foreground placeholder:text-muted-foreground/60"
                 />
               </div>
 

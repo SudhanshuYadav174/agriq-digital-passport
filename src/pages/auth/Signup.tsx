@@ -205,164 +205,175 @@ const Signup = () => {
                   {/* Personal Information */}
                   <div className="space-y-4">
                     <h3 className="text-lg font-semibold text-foreground">Personal Information</h3>
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="firstName">First Name</Label>
-                        <Input
-                          id="firstName"
-                          name="firstName"
-                          placeholder="Enter your first name"
-                          value={formData.firstName}
-                          onChange={handleInputChange}
-                          required
-                          className="placeholder:text-muted-foreground/60"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="lastName">Last Name</Label>
-                        <Input
-                          id="lastName"
-                          name="lastName"
-                          placeholder="Enter your last name"
-                          value={formData.lastName}
-                          onChange={handleInputChange}
-                          required
-                          className="placeholder:text-muted-foreground/60"
-                        />
-                      </div>
-                    </div>
+                     {/* Demo Account Info */}
+                     <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 mb-4">
+                       <h4 className="text-sm font-medium text-foreground mb-2">Demo Account Available:</h4>
+                       <p className="text-xs text-muted-foreground">
+                         Try our platform with demo credentials. See login page for demo account details.
+                       </p>
+                     </div>
 
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="email">Email</Label>
-                        <Input
-                          id="email"
-                          name="email"
-                          type="email"
-                          placeholder="Enter your email address"
-                          value={formData.email}
-                          onChange={handleInputChange}
-                          required
-                          className="placeholder:text-muted-foreground/60"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="phone">Phone</Label>
-                        <Input
-                          id="phone"
-                          name="phone"
-                          type="tel"
-                          placeholder="Enter your phone number"
-                          value={formData.phone}
-                          onChange={handleInputChange}
-                          required
-                          className="placeholder:text-muted-foreground/60"
-                        />
-                      </div>
-                    </div>
+                     <div className="grid md:grid-cols-2 gap-4">
+                       <div className="space-y-2">
+                         <Label htmlFor="firstName" className="text-foreground">First Name</Label>
+                         <Input
+                           id="firstName"
+                           name="firstName"
+                           placeholder="Enter your first name"
+                           value={formData.firstName}
+                           onChange={handleInputChange}
+                           required
+                           className="bg-background/50 border-border text-foreground placeholder:text-muted-foreground/60"
+                         />
+                       </div>
+                       <div className="space-y-2">
+                         <Label htmlFor="lastName" className="text-foreground">Last Name</Label>
+                         <Input
+                           id="lastName"
+                           name="lastName"
+                           placeholder="Enter your last name"
+                           value={formData.lastName}
+                           onChange={handleInputChange}
+                           required
+                           className="bg-background/50 border-border text-foreground placeholder:text-muted-foreground/60"
+                         />
+                       </div>
+                     </div>
 
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="password">Password</Label>
-                        <Input
-                          id="password"
-                          name="password"
-                          type="password"
-                          placeholder="Create a strong password"
-                          value={formData.password}
-                          onChange={handleInputChange}
-                          required
-                          className="placeholder:text-muted-foreground/60"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="confirmPassword">Confirm Password</Label>
-                        <Input
-                          id="confirmPassword"
-                          name="confirmPassword"
-                          type="password"
-                          placeholder="Confirm your password"
-                          value={formData.confirmPassword}
-                          onChange={handleInputChange}
-                          required
-                          className="placeholder:text-muted-foreground/60"
-                        />
-                      </div>
-                    </div>
+                     <div className="grid md:grid-cols-2 gap-4">
+                       <div className="space-y-2">
+                         <Label htmlFor="email" className="text-foreground">Email</Label>
+                         <Input
+                           id="email"
+                           name="email"
+                           type="email"
+                           placeholder="Enter your email address"
+                           value={formData.email}
+                           onChange={handleInputChange}
+                           required
+                           className="bg-background/50 border-border text-foreground placeholder:text-muted-foreground/60"
+                         />
+                       </div>
+                       <div className="space-y-2">
+                         <Label htmlFor="phone" className="text-foreground">Phone</Label>
+                         <Input
+                           id="phone"
+                           name="phone"
+                           type="tel"
+                           placeholder="Enter your phone number"
+                           value={formData.phone}
+                           onChange={handleInputChange}
+                           required
+                           className="bg-background/50 border-border text-foreground placeholder:text-muted-foreground/60"
+                         />
+                       </div>
+                     </div>
+
+                     <div className="grid md:grid-cols-2 gap-4">
+                       <div className="space-y-2">
+                         <Label htmlFor="password" className="text-foreground">Password</Label>
+                         <Input
+                           id="password"
+                           name="password"
+                           type="password"
+                           placeholder="Create a strong password"
+                           value={formData.password}
+                           onChange={handleInputChange}
+                           required
+                           className="bg-background/50 border-border text-foreground placeholder:text-muted-foreground/60"
+                         />
+                       </div>
+                       <div className="space-y-2">
+                         <Label htmlFor="confirmPassword" className="text-foreground">Confirm Password</Label>
+                         <Input
+                           id="confirmPassword"
+                           name="confirmPassword"
+                           type="password"
+                           placeholder="Confirm your password"
+                           value={formData.confirmPassword}
+                           onChange={handleInputChange}
+                           required
+                           className="bg-background/50 border-border text-foreground placeholder:text-muted-foreground/60"
+                         />
+                       </div>
+                     </div>
                   </div>
 
                   {/* Organization Information */}
                   <div className="space-y-4">
                     <h3 className="text-lg font-semibold text-foreground">Organization Information</h3>
                     <div className="grid md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="organizationName">Organization Name</Label>
-                        <Input
-                          id="organizationName"
-                          name="organizationName"
-                          value={formData.organizationName}
-                          onChange={handleInputChange}
-                          required
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="organizationType">Organization Type</Label>
-                        <Select value={formData.organizationType} onValueChange={(value) => handleSelectChange("organizationType", value)}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select type" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="farm">Farm</SelectItem>
-                            <SelectItem value="processor">Processor</SelectItem>
-                            <SelectItem value="exporter">Exporter</SelectItem>
-                            <SelectItem value="importer">Importer</SelectItem>
-                            <SelectItem value="agency">QA Agency</SelectItem>
-                            <SelectItem value="customs">Customs</SelectItem>
-                            <SelectItem value="other">Other</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
+                       <div className="space-y-2">
+                         <Label htmlFor="organizationName" className="text-foreground">Organization Name</Label>
+                         <Input
+                           id="organizationName"
+                           name="organizationName"
+                           value={formData.organizationName}
+                           onChange={handleInputChange}
+                           required
+                           className="bg-background/50 border-border text-foreground placeholder:text-muted-foreground/60"
+                         />
+                       </div>
+                       <div className="space-y-2">
+                         <Label htmlFor="organizationType" className="text-foreground">Organization Type</Label>
+                         <Select value={formData.organizationType} onValueChange={(value) => handleSelectChange("organizationType", value)}>
+                           <SelectTrigger className="bg-background/50 border-border text-foreground">
+                             <SelectValue placeholder="Select type" />
+                           </SelectTrigger>
+                           <SelectContent>
+                             <SelectItem value="farm">Farm</SelectItem>
+                             <SelectItem value="processor">Processor</SelectItem>
+                             <SelectItem value="exporter">Exporter</SelectItem>
+                             <SelectItem value="importer">Importer</SelectItem>
+                             <SelectItem value="agency">QA Agency</SelectItem>
+                             <SelectItem value="customs">Customs</SelectItem>
+                             <SelectItem value="other">Other</SelectItem>
+                           </SelectContent>
+                         </Select>
+                       </div>
+                     </div>
 
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="country">Country</Label>
-                        <Select value={formData.country} onValueChange={(value) => handleSelectChange("country", value)}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select country" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="us">United States</SelectItem>
-                            <SelectItem value="in">India</SelectItem>
-                            <SelectItem value="br">Brazil</SelectItem>
-                            <SelectItem value="cn">China</SelectItem>
-                            <SelectItem value="other">Other</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="website">Website (Optional)</Label>
-                        <Input
-                          id="website"
-                          name="website"
-                          type="url"
-                          value={formData.website}
-                          onChange={handleInputChange}
-                        />
-                      </div>
-                    </div>
+                     <div className="grid md:grid-cols-2 gap-4">
+                       <div className="space-y-2">
+                         <Label htmlFor="country" className="text-foreground">Country</Label>
+                         <Select value={formData.country} onValueChange={(value) => handleSelectChange("country", value)}>
+                           <SelectTrigger className="bg-background/50 border-border text-foreground">
+                             <SelectValue placeholder="Select country" />
+                           </SelectTrigger>
+                           <SelectContent>
+                             <SelectItem value="us">United States</SelectItem>
+                             <SelectItem value="in">India</SelectItem>
+                             <SelectItem value="br">Brazil</SelectItem>
+                             <SelectItem value="cn">China</SelectItem>
+                             <SelectItem value="other">Other</SelectItem>
+                           </SelectContent>
+                         </Select>
+                       </div>
+                       <div className="space-y-2">
+                         <Label htmlFor="website" className="text-foreground">Website (Optional)</Label>
+                         <Input
+                           id="website"
+                           name="website"
+                           type="url"
+                           value={formData.website}
+                           onChange={handleInputChange}
+                           className="bg-background/50 border-border text-foreground placeholder:text-muted-foreground/60"
+                         />
+                       </div>
+                     </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="address">Address</Label>
-                      <Textarea
-                        id="address"
-                        name="address"
-                        value={formData.address}
-                        onChange={handleInputChange}
-                        rows={3}
-                        required
-                      />
-                    </div>
+                     <div className="space-y-2">
+                       <Label htmlFor="address" className="text-foreground">Address</Label>
+                       <Textarea
+                         id="address"
+                         name="address"
+                         value={formData.address}
+                         onChange={handleInputChange}
+                         rows={3}
+                         required
+                         className="bg-background/50 border-border text-foreground placeholder:text-muted-foreground/60"
+                       />
+                     </div>
                   </div>
 
                   {/* Role-specific fields */}
@@ -370,26 +381,28 @@ const Signup = () => {
                     <div className="space-y-4">
                       <h3 className="text-lg font-semibold text-foreground">Additional Information</h3>
                       <div className="grid md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="licenseNumber">License Number</Label>
-                          <Input
-                            id="licenseNumber"
-                            name="licenseNumber"
-                            value={formData.licenseNumber}
-                            onChange={handleInputChange}
-                            required
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="certifications">Certifications</Label>
-                          <Input
-                            id="certifications"
-                            name="certifications"
-                            value={formData.certifications}
-                            onChange={handleInputChange}
-                            placeholder="e.g., ISO 9001, HACCP"
-                          />
-                        </div>
+                         <div className="space-y-2">
+                           <Label htmlFor="licenseNumber" className="text-foreground">License Number</Label>
+                           <Input
+                             id="licenseNumber"
+                             name="licenseNumber"
+                             value={formData.licenseNumber}
+                             onChange={handleInputChange}
+                             required
+                             className="bg-background/50 border-border text-foreground placeholder:text-muted-foreground/60"
+                           />
+                         </div>
+                         <div className="space-y-2">
+                           <Label htmlFor="certifications" className="text-foreground">Certifications</Label>
+                           <Input
+                             id="certifications"
+                             name="certifications"
+                             value={formData.certifications}
+                             onChange={handleInputChange}
+                             placeholder="e.g., ISO 9001, HACCP"
+                             className="bg-background/50 border-border text-foreground placeholder:text-muted-foreground/60"
+                           />
+                         </div>
                       </div>
                     </div>
                   )}
