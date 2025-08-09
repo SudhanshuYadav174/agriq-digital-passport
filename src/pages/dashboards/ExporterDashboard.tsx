@@ -72,7 +72,12 @@ const ExporterDashboard = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 space-y-8">
+    <div className="min-h-screen bg-muted/30 relative">
+      <div className="absolute inset-0">
+        <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-primary/5 rounded-full blur-xl animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-secondary/5 rounded-full blur-2xl animate-pulse" style={{ animationDelay: "1s" }} />
+      </div>
+      <div className="container mx-auto px-4 py-8 space-y-8 relative z-10">
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
         <div>
@@ -240,6 +245,7 @@ const ExporterDashboard = () => {
           </div>
         </TabsContent>
       </Tabs>
+      </div>
     </div>
   );
 };

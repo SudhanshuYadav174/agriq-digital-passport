@@ -155,8 +155,8 @@ const Signup = () => {
           <div className="lg:col-span-1">
             <Card className="glass border-white/20 shadow-glow bg-card/95 backdrop-blur-md">
               <CardHeader>
-                <CardTitle className="text-lg text-card-foreground">Choose Your Role</CardTitle>
-                <CardDescription>Select the role that best describes you</CardDescription>
+                <CardTitle className="text-lg font-semibold text-foreground">Choose Your Role</CardTitle>
+                <CardDescription className="text-muted-foreground">Select the role that best describes you</CardDescription>
               </CardHeader>
               <CardContent>
                 <Tabs value={selectedRole} onValueChange={(value) => setSelectedRole(value as keyof typeof roleConfigs)} orientation="vertical">
@@ -175,7 +175,7 @@ const Signup = () => {
 
                 {/* Benefits */}
                 <div className="mt-6 space-y-3">
-                  <h4 className="font-medium text-card-foreground">What you get:</h4>
+                  <h4 className="font-medium text-foreground">What you get:</h4>
                   <ul className="space-y-2">
                     {currentRoleConfig.benefits.map((benefit, index) => (
                       <li key={index} className="flex items-start space-x-2 text-sm text-muted-foreground">
@@ -195,16 +195,16 @@ const Signup = () => {
               <CardHeader>
                 <div className="flex items-center space-x-2">
                   <RoleIcon className={`h-6 w-6 ${currentRoleConfig.color}`} />
-                  <CardTitle className="text-xl text-card-foreground">{currentRoleConfig.title}</CardTitle>
+                  <CardTitle className="text-xl font-semibold text-foreground">{currentRoleConfig.title}</CardTitle>
                 </div>
-                <CardDescription>{currentRoleConfig.description}</CardDescription>
+                <CardDescription className="text-muted-foreground">{currentRoleConfig.description}</CardDescription>
               </CardHeader>
 
               <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-6">
                   {/* Personal Information */}
                   <div className="space-y-4">
-                    <h3 className="text-lg font-semibold text-card-foreground">Personal Information</h3>
+                    <h3 className="text-lg font-semibold text-foreground">Personal Information</h3>
                     <div className="grid md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="firstName">First Name</Label>
@@ -293,7 +293,7 @@ const Signup = () => {
 
                   {/* Organization Information */}
                   <div className="space-y-4">
-                    <h3 className="text-lg font-semibold text-card-foreground">Organization Information</h3>
+                    <h3 className="text-lg font-semibold text-foreground">Organization Information</h3>
                     <div className="grid md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="organizationName">Organization Name</Label>
@@ -368,7 +368,7 @@ const Signup = () => {
                   {/* Role-specific fields */}
                   {(selectedRole === "qa_agency" || selectedRole === "admin") && (
                     <div className="space-y-4">
-                      <h3 className="text-lg font-semibold text-card-foreground">Additional Information</h3>
+                      <h3 className="text-lg font-semibold text-foreground">Additional Information</h3>
                       <div className="grid md:grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <Label htmlFor="licenseNumber">License Number</Label>

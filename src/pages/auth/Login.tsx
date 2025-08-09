@@ -56,7 +56,7 @@ const Login = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    const { data, error } = await signIn(formData.email, formData.password);
+    const { data, error } = await signIn(formData.email, formData.password, selectedRole);
     
     if (data && !error) {
       // Redirect based on role

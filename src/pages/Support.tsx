@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { ParticleBackground } from "@/components/ui/particle-background";
+import ChatBot from "@/components/ui/ChatBot";
 import { 
   HelpCircle, 
   FileText, 
@@ -434,6 +435,7 @@ const Support = () => {
           </TabsContent>
         </Tabs>
       </div>
+      <ChatBot />
     </div>
   );
 };

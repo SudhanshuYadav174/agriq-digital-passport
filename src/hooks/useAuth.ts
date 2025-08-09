@@ -60,7 +60,7 @@ export const useAuth = () => {
     }
   };
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = async (email: string, password: string, expectedRole?: string) => {
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -68,6 +68,15 @@ export const useAuth = () => {
       });
 
       if (error) throw error;
+
+      // Check if user has expected role if provided
+      if (expectedRole && data.user) {
+        const userRole = data.user.user_metadata?.role;
+        if (userRole && userRole !== expectedRole) {
+          await supabase.auth.signOut();
+          throw new Error(`Account does not exist for the selected role (${expectedRole}). Please check your credentials or register for this role.`);
+        }
+      }
 
       toast({
         title: "Welcome back!",
