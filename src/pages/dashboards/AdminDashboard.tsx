@@ -1,10 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { ParticleBackground } from "@/components/ui/particle-background";
+import AddUserModal from "@/components/ui/AddUserModal";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import { 
   Users, 
   Shield, 
@@ -23,6 +26,30 @@ import {
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
+  const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
+  const [users, setUsers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+
+  const fetchUsers = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setUsers(data || []);
+    } catch (error: any) {
+      console.error('Error fetching users:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   // Mock data
   const systemStats = [
@@ -80,7 +107,7 @@ const AdminDashboard = () => {
             <Settings className="h-5 w-5 mr-2" />
             System Settings
           </Button>
-          <Button variant="agri" size="lg">
+          <Button variant="agri" size="lg" onClick={() => setIsAddUserModalOpen(true)}>
             <Plus className="h-5 w-5 mr-2" />
             Add User
           </Button>
@@ -209,7 +236,7 @@ const AdminDashboard = () => {
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input placeholder="Search users..." className="pl-10" />
                   </div>
-                  <Button variant="agri" size="sm">
+                  <Button variant="agri" size="sm" onClick={() => setIsAddUserModalOpen(true)}>
                     <Plus className="h-4 w-4 mr-2" />
                     Add User
                   </Button>
@@ -218,15 +245,26 @@ const AdminDashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {recentUsers.map((user) => (
+                {loading ? (
+                  <div className="text-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+                    <p className="text-muted-foreground mt-2">Loading users...</p>
+                  </div>
+                ) : users.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p>No users found.</p>
+                  </div>
+                ) : (
+                  users.map((user) => (
                   <div key={user.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors">
                     <div className="flex items-center space-x-4">
                       <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
                         <Users className="h-5 w-5 text-primary" />
                       </div>
                       <div>
-                        <div className="font-medium">{user.name}</div>
-                        <div className="text-sm text-muted-foreground">{user.email}</div>
+                        <div className="font-medium">{user.first_name} {user.last_name}</div>
+                        <div className="text-sm text-muted-foreground">{user.user_id}</div>
                       </div>
                     </div>
                     <div className="flex items-center space-x-4">
@@ -234,10 +272,12 @@ const AdminDashboard = () => {
                         <Badge className={getRoleColor(user.role)} variant="outline">
                           {user.role}
                         </Badge>
-                        <div className="text-sm text-muted-foreground mt-1">Joined {user.joinDate}</div>
+                        <div className="text-sm text-muted-foreground mt-1">
+                          Joined {new Date(user.created_at).toLocaleDateString()}
+                        </div>
                       </div>
-                      <Badge className={getStatusColor(user.status)}>
-                        {user.status.charAt(0).toUpperCase() + user.status.slice(1)}
+                      <Badge className="bg-success text-success-foreground">
+                        Active
                       </Badge>
                       <div className="flex space-x-2">
                         <Button variant="outline" size="sm">
@@ -249,7 +289,8 @@ const AdminDashboard = () => {
                       </div>
                     </div>
                   </div>
-                ))}
+                  ))
+                )}
               </div>
             </CardContent>
           </Card>
@@ -316,6 +357,13 @@ const AdminDashboard = () => {
         </TabsContent>
       </Tabs>
       </div>
+
+      {/* Add User Modal */}
+      <AddUserModal
+        open={isAddUserModalOpen}
+        onOpenChange={setIsAddUserModalOpen}
+        onUserAdded={fetchUsers}
+      />
     </div>
   );
 };

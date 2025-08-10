@@ -3,6 +3,45 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { ArrowRight, Shield, Leaf, Globe, QrCode } from "lucide-react";
 import { ParticleBackground } from "@/components/ui/particle-background";
+import { useAuth } from "@/hooks/useAuth";
+import { useState } from "react";
+
+const HeroTrialButton = () => {
+  const { user, getUserProfile } = useAuth();
+  const [userProfile, setUserProfile] = useState<any>(null);
+
+  useEffect(() => {
+    if (user) {
+      getUserProfile().then(setUserProfile);
+    }
+  }, [user, getUserProfile]);
+
+  if (user) {
+    const role = userProfile?.role || user.user_metadata?.role;
+    const dashboardPath = role === 'admin' ? '/dashboard/admin' : 
+                         role === 'qa' ? '/dashboard/qa' : 
+                         role === 'importer' ? '/dashboard/importer' : 
+                         '/dashboard/exporter';
+    
+    return (
+      <Button variant="trial" size="xl" asChild className="group">
+        <Link to={dashboardPath}>
+          {role === 'admin' ? 'Go to Admin Dashboard' : 'Go to Dashboard'}
+          <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+        </Link>
+      </Button>
+    );
+  }
+
+  return (
+    <Button variant="trial" size="xl" asChild className="group">
+      <Link to="/signup">
+        Start Free Trial
+        <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+      </Link>
+    </Button>
+  );
+};
 
 const HeroSection = () => {
   const heroRef = useRef<HTMLDivElement>(null);
@@ -68,12 +107,7 @@ const HeroSection = () => {
 
             {/* CTAs */}
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button variant="trial" size="xl" asChild className="group">
-                <Link to="/submit">
-                  Start Free Trial
-                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                </Link>
-              </Button>
+              <HeroTrialButton />
               <Button variant="glass" size="xl" asChild className="group">
                 <Link to="/verify">
                   Verify Certificate

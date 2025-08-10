@@ -60,10 +60,10 @@ const App = () => (
             <Route path="submit" element={<AuthGuard><NewSubmission /></AuthGuard>} />
             
             {/* Dashboard Routes */}
-            <Route path="dashboard/exporter" element={<ExporterDashboard />} />
-            <Route path="dashboard/qa" element={<QADashboard />} />
-            <Route path="dashboard/importer" element={<ImporterDashboard />} />
-            <Route path="dashboard/admin" element={<AdminDashboard />} />
+            <Route path="dashboard/exporter" element={<AuthGuard><ExporterDashboard /></AuthGuard>} />
+            <Route path="dashboard/qa" element={<AuthGuard><QADashboard /></AuthGuard>} />
+            <Route path="dashboard/importer" element={<AuthGuard><ImporterDashboard /></AuthGuard>} />
+            <Route path="dashboard/admin" element={<AuthGuard><AdminDashboard /></AuthGuard>} />
           </Route>
           
           {/* Catch-all */}

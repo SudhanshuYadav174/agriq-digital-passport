@@ -34,6 +34,15 @@ const Header = () => {
 
   const isActive = (path: string) => location.pathname === path;
 
+  const getDashboardPath = (role: string) => {
+    switch (role) {
+      case 'admin': return '/dashboard/admin';
+      case 'qa': return '/dashboard/qa';
+      case 'importer': return '/dashboard/importer';
+      default: return '/dashboard/exporter';
+    }
+  };
+
   const navigation = [
     { name: "Home", href: "/" },
     { name: "Features", href: "/features" },
@@ -98,7 +107,7 @@ const Header = () => {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem asChild>
-                    <Link to={`/dashboard/${userProfile?.role || 'exporter'}`}>
+                    <Link to={getDashboardPath(userProfile?.role || user.user_metadata?.role)}>
                       Dashboard
                     </Link>
                   </DropdownMenuItem>
