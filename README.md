@@ -1,64 +1,95 @@
 ﻿# AgriQ Digital Passport
-Tamper-proof agricultural batch & certificate verification: Supabase (rich data) + ICP canister (integrity & status).
 
-## 🚀 Summary
-Exporters, auditors, and importers issue & verify quality certificates. Critical fields anchored on Internet Computer for immutability & revocation; full metadata + auth in Supabase.
+Tamperproof agricultural batch & certificate verification using a hybrid architecture: Supabase for rich relational + auth, Internet Computer (ICP) canister for immutable integrity + status.
+
+##  Summary
+AgriQ empowers exporters, quality auditors, and importers to issue, manage, and verify digital quality certificates. Core certificate fields + revocation+expiry logic live on-chain in `passport_registry` ensuring transparency and antitamper guarantees. Extended metadata (profiles, analytics) stays in Supabase for flexibility & speed.
 
 ##  Architecture
-React UI  Supabase (Auth, Edge Functions)  ICP Canister (`passport_registry`). Verification calls Supabase function then cross-checks on-chain status.
+Frontend (React + Vite + shadcn-ui)  Supabase Edge Functions (issue / verify)  ICP Canister (Motoko) for anchoring & verification status.
+
+```
+[User] -> [React UI] --(HTTPS)--> [Supabase Functions] --(Agent)--> [ICP Canister]
+                                 |                               
+                                 +--> [Supabase DB / Auth]
+```
+
+##  Canister `passport_registry`
+Motoko actor storing minimal certificate records and providing:
+- `upsert` create/update
+- `verify` returns {valid,status,reason,certificate}
+- `get`
+- `list`
+
+##  Integrity & Roadmap
+Current: On-chain anchor of critical fields + status.
+Planned (priority):
+1. Content hash anchoring of full batch JSON
+2. Revocation event log + audit trail
+3. DID / II integration (issuer identity)
+4. Merkle aggregation for large batch sets
+5. DAO policy governance for revocations
 
 ##  Stack
-React, Vite, TypeScript, Tailwind, shadcn-ui, Supabase, ICP (Motoko), @tanstack/react-query.
+React, TypeScript, Vite, Tailwind, shadcn-ui, @tanstack/react-query, Supabase, ICP (Motoko), @dfinity/agent.
 
-##  Canister (`passport_registry`)
-APIs: upsert, verify, get, list. See `src/ic/passport_registry/main.mo`.
-
-##  Integrity Strategy
-- On-chain minimal record (id, product, batch, issuer, times, revoked flag)
-- Off-chain extended relational data
-- Roadmap: hashed payload anchoring, DID signatures, revocation event log, DAO governance.
-
-## 🧪 Local Dev
+##  Local Development
 ```powershell
 npm install
-npm run ic:start
-npm run ic:deploy
-# copy canister id from .ic-env to .env.local as VITE_PASSPORT_CANISTER_ID
-npm run ic:seed
-npm run dev
+npm run ic:start      # start local ICP replica
+npm run ic:deploy     # deploy canister, writes .ic-env
+# copy CANISTER_ID for passport_registry into .env.local as VITE_PASSPORT_CANISTER_ID
+npm run ic:seed       # seed demo certificate AGR-2024-001
+npm run dev           # start frontend (http://localhost:8080)
 ```
-Visit http://localhost:8080/verify and test AGR-2024-001.
+Visit /verify and test AGR-2024-001.
 
-##  Env (.env.local)
-VITE_SUPABASE_URL=...
-VITE_SUPABASE_ANON_KEY=...
-VITE_PASSPORT_CANISTER_ID=...
+##  Environment (.env.local)
+```
+VITE_SUPABASE_URL=
+VITE_SUPABASE_ANON_KEY=
+VITE_PASSPORT_CANISTER_ID=
 VITE_IC_HOST=http://127.0.0.1:4943
+```
 
 ##  Scripts
-ic:start | ic:deploy | ic:generate | ic:seed | dev:full
+| Script | Purpose |
+|--------|---------|
+| ic:start | Start local replica |
+| ic:deploy | Deploy canister(s) |
+| ic:generate | Generate bindings (optional) |
+| ic:seed | Seed sample certificate |
+| dev:full | Start replica, deploy, run Vite |
 
-##  Submission Assets (Add before submission)
-Demo Video: LINK
-Pitch Video: LINK
-Deck: docs/pitch-deck.pdf
+##  Verification Flow
+1. User enters certificate ID.
+2. Supabase edge function verify (off-chain business logic / enrichment).
+3. Frontend cross-checks ICP `verify` for authoritative status (revoked/expired/valid).
+4. UI merges results.
+
+##  Submission Assets (Add Links Before Submission)
+- Demo Video (<=10 min): LINK_HERE
+- Pitch Video (team + problem + solution + biz model + roadmap): LINK_HERE
+- Deck: `/docs/pitch-deck.pdf`
 
 ##  Business Model
-Tiered per certificate + analytics & enterprise compliance API.
+Usage-based (per certificate issuance) + analytics tier + enterprise compliance integration (API SLAs). Future marketplace for auditor plugins.
 
-## 🗺 Roadmap
-Q3: Hash anchoring, revocation UI
-Q4: DID (Internet Identity), Merkle batch proofs
-Q1: DAO governance, auditor plugin marketplace
+##  Roadmap (High Level)
+- Q3: Hash anchoring, revocation UI
+- Q4: DID & Merkle proofs
+- Q1: DAO governance + auditor marketplace
 
 ## 📈 Round Changelog
-See `CHANGELOG.md` for new features this round.
+See `CHANGELOG.md` for features added this hackathon round.
 
 ## 🤝 Contributing
-PRs welcome. Run `npm run lint` before commit.
+PRs welcome. Run `npm run lint`. Follow conventional commits.
 
-##  Security Notes
-No private keys in client. Future: ECDSA signing & DID integration.
+## 🛡 Security Notes
+No private keys in client. Future: ECDSA signing via canister or wallet; DID for issuer auth.
 
 ##  Team
-Add team bios & roles here.
+(Add members / roles / contact)
+
+MIT License.
