@@ -1,0 +1,20 @@
+{
+  "canisters": {
+    "passport_registry": {
+      "type": "motoko",
+      "main": "src/ic/passport_registry/main.mo"
+    }
+  },
+  "networks": {
+    "local": {
+      "bind": "127.0.0.1:4943",
+      "type": "ephemeral"
+    },
+    "ic": {
+      "providers": [
+        "https://ic0.app"
+      ]
+    }
+  },
+  "output_env_file": ".ic-env"
+}
