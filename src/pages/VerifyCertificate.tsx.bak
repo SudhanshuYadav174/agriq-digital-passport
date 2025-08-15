@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState`r`nimport { getPassportActor } from "@/integrations/ic/agent"; } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -44,11 +44,11 @@ const VerifyCertificate = () => {
 
       if (error) throw error;
 
-      setVerificationResult(data);
+      setVerificationResult(data);\n      // ICP verification fallback (on-chain cross-check)\n      try { const actor = await getPassportActor(); const icResult = await actor.verify(certificateId); if (icResult && icResult.certificate && icResult.certificate.length) { const c = icResult.certificate[0]; setVerificationResult({ valid: icResult.valid, certificateNumber: certificateId, status: icResult.status, batch: { product_name: c.productName, batch_number: c.batchNumber, origin_location: c.origin, profiles: { organization_name: c.issuer, country: "" } }, issuedDate: new Date(Number(c.issuedAt)).toISOString(), expiryDate: new Date(Number(c.expiresAt)).toISOString(), error: icResult.reason && icResult.reason.length ? icResult.reason[0] : null }); } } catch (e) { console.warn("ICP verification fallback failed", e); }
       
       if (data.valid) {
         toast({
-          title: "Certificate Verified ✓",
+          title: "Certificate Verified âœ“",
           description: "This certificate is valid and authentic.",
         });
       } else {
@@ -334,3 +334,4 @@ const VerifyCertificate = () => {
 };
 
 export default VerifyCertificate;
+
