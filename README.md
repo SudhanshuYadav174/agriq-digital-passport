@@ -1,73 +1,64 @@
-# Welcome to your Lovable project
+﻿# AgriQ Digital Passport
+Tamper-proof agricultural batch & certificate verification: Supabase (rich data) + ICP canister (integrity & status).
 
-## Project info
+## 🚀 Summary
+Exporters, auditors, and importers issue & verify quality certificates. Critical fields anchored on Internet Computer for immutability & revocation; full metadata + auth in Supabase.
 
-**URL**: https://lovable.dev/projects/cabe93b6-02e2-4416-a583-9b52cec21768
+##  Architecture
+React UI  Supabase (Auth, Edge Functions)  ICP Canister (`passport_registry`). Verification calls Supabase function then cross-checks on-chain status.
 
-## How can I edit this code?
+##  Stack
+React, Vite, TypeScript, Tailwind, shadcn-ui, Supabase, ICP (Motoko), @tanstack/react-query.
 
-There are several ways of editing your application.
+##  Canister (`passport_registry`)
+APIs: upsert, verify, get, list. See `src/ic/passport_registry/main.mo`.
 
-**Use Lovable**
+##  Integrity Strategy
+- On-chain minimal record (id, product, batch, issuer, times, revoked flag)
+- Off-chain extended relational data
+- Roadmap: hashed payload anchoring, DID signatures, revocation event log, DAO governance.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/cabe93b6-02e2-4416-a583-9b52cec21768) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+## 🧪 Local Dev
+```powershell
+npm install
+npm run ic:start
+npm run ic:deploy
+# copy canister id from .ic-env to .env.local as VITE_PASSPORT_CANISTER_ID
+npm run ic:seed
 npm run dev
 ```
+Visit http://localhost:8080/verify and test AGR-2024-001.
 
-**Edit a file directly in GitHub**
+##  Env (.env.local)
+VITE_SUPABASE_URL=...
+VITE_SUPABASE_ANON_KEY=...
+VITE_PASSPORT_CANISTER_ID=...
+VITE_IC_HOST=http://127.0.0.1:4943
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+##  Scripts
+ic:start | ic:deploy | ic:generate | ic:seed | dev:full
 
-**Use GitHub Codespaces**
+##  Submission Assets (Add before submission)
+Demo Video: LINK
+Pitch Video: LINK
+Deck: docs/pitch-deck.pdf
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+##  Business Model
+Tiered per certificate + analytics & enterprise compliance API.
 
-## What technologies are used for this project?
+## 🗺 Roadmap
+Q3: Hash anchoring, revocation UI
+Q4: DID (Internet Identity), Merkle batch proofs
+Q1: DAO governance, auditor plugin marketplace
 
-This project is built with:
+## 📈 Round Changelog
+See `CHANGELOG.md` for new features this round.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## 🤝 Contributing
+PRs welcome. Run `npm run lint` before commit.
 
-## How can I deploy this project?
+##  Security Notes
+No private keys in client. Future: ECDSA signing & DID integration.
 
-Simply open [Lovable](https://lovable.dev/projects/cabe93b6-02e2-4416-a583-9b52cec21768) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+##  Team
+Add team bios & roles here.
