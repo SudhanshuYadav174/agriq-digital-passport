@@ -67,10 +67,6 @@ VITE_IC_HOST=http://127.0.0.1:4943
 3. Frontend cross-checks ICP `verify` for authoritative status (revoked/expired/valid).
 4. UI merges results.
 
-##  Submission Assets (Add Links Before Submission)
-- Demo Video (<=10 min): LINK_HERE
-- Pitch Video (team + problem + solution + biz model + roadmap): LINK_HERE
-- Deck: `/docs/pitch-deck.pdf`
 
 ##  Business Model
 Usage-based (per certificate issuance) + analytics tier + enterprise compliance integration (API SLAs). Future marketplace for auditor plugins.
@@ -89,7 +85,3 @@ PRs welcome. Run `npm run lint`. Follow conventional commits.
 ## 🛡 Security Notes
 No private keys in client. Future: ECDSA signing via canister or wallet; DID for issuer auth.
 
-##  Team
-(Add members / roles / contact)
-
-MIT License.
