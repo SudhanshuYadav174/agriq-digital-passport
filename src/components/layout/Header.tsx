@@ -35,10 +35,12 @@ const Header = () => {
   const isActive = (path: string) => location.pathname === path;
 
   const getDashboardPath = (role: string) => {
-    switch (role) {
+    switch (role?.toLowerCase()) {
       case 'admin': return '/dashboard/admin';
+      case 'qa_agency':
       case 'qa': return '/dashboard/qa';
       case 'importer': return '/dashboard/importer';
+      case 'exporter':
       default: return '/dashboard/exporter';
     }
   };
@@ -107,7 +109,7 @@ const Header = () => {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem asChild>
-                    <Link to={getDashboardPath(userProfile?.role || user.user_metadata?.role)}>
+                    <Link to={getDashboardPath(userProfile?.role || user.user_metadata?.role || 'exporter')}>
                       Dashboard
                     </Link>
                   </DropdownMenuItem>
