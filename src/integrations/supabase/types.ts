@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.12 (cd3cf9e)"
@@ -172,6 +172,81 @@ export type Database = {
           },
         ]
       }
+      digital_certificates: {
+        Row: {
+          batch_id: string | null
+          certificate_data: Json
+          certificate_hash: string | null
+          certificate_number: string
+          created_at: string
+          digital_signature: string | null
+          download_count: number | null
+          expiry_date: string
+          id: string
+          inspection_id: string | null
+          issue_date: string | null
+          issued_by: string
+          issued_to: string
+          qr_code: string
+          status: string | null
+          updated_at: string
+          verification_url: string | null
+        }
+        Insert: {
+          batch_id?: string | null
+          certificate_data: Json
+          certificate_hash?: string | null
+          certificate_number: string
+          created_at?: string
+          digital_signature?: string | null
+          download_count?: number | null
+          expiry_date: string
+          id?: string
+          inspection_id?: string | null
+          issue_date?: string | null
+          issued_by: string
+          issued_to: string
+          qr_code: string
+          status?: string | null
+          updated_at?: string
+          verification_url?: string | null
+        }
+        Update: {
+          batch_id?: string | null
+          certificate_data?: Json
+          certificate_hash?: string | null
+          certificate_number?: string
+          created_at?: string
+          digital_signature?: string | null
+          download_count?: number | null
+          expiry_date?: string
+          id?: string
+          inspection_id?: string | null
+          issue_date?: string | null
+          issued_by?: string
+          issued_to?: string
+          qr_code?: string
+          status?: string | null
+          updated_at?: string
+          verification_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "digital_certificates_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "batches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "digital_certificates_inspection_id_fkey"
+            columns: ["inspection_id"]
+            isOneToOne: false
+            referencedRelation: "inspection_actions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       documents: {
         Row: {
           access_level: string
@@ -240,6 +315,74 @@ export type Database = {
           version?: number | null
         }
         Relationships: []
+      }
+      inspection_actions: {
+        Row: {
+          action_type: string
+          batch_id: string | null
+          certificate_issued: boolean | null
+          completed_date: string | null
+          contact_person: string | null
+          created_at: string
+          id: string
+          inspector_id: string
+          location: string | null
+          notes: string | null
+          photos: string[] | null
+          priority: string | null
+          quality_score: number | null
+          scheduled_date: string | null
+          status: string
+          test_results: Json | null
+          updated_at: string
+        }
+        Insert: {
+          action_type: string
+          batch_id?: string | null
+          certificate_issued?: boolean | null
+          completed_date?: string | null
+          contact_person?: string | null
+          created_at?: string
+          id?: string
+          inspector_id: string
+          location?: string | null
+          notes?: string | null
+          photos?: string[] | null
+          priority?: string | null
+          quality_score?: number | null
+          scheduled_date?: string | null
+          status?: string
+          test_results?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          action_type?: string
+          batch_id?: string | null
+          certificate_issued?: boolean | null
+          completed_date?: string | null
+          contact_person?: string | null
+          created_at?: string
+          id?: string
+          inspector_id?: string
+          location?: string | null
+          notes?: string | null
+          photos?: string[] | null
+          priority?: string | null
+          quality_score?: number | null
+          scheduled_date?: string | null
+          status?: string
+          test_results?: Json | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inspection_actions_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "batches"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       inspections: {
         Row: {
@@ -752,12 +895,56 @@ export type Database = {
           },
         ]
       }
+      verification_logs: {
+        Row: {
+          certificate_id: string | null
+          created_at: string
+          id: string
+          ip_address: string | null
+          user_agent: string | null
+          verification_method: string
+          verification_status: string
+          verifier_id: string | null
+        }
+        Insert: {
+          certificate_id?: string | null
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          user_agent?: string | null
+          verification_method: string
+          verification_status: string
+          verifier_id?: string | null
+        }
+        Update: {
+          certificate_id?: string | null
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          user_agent?: string | null
+          verification_method?: string
+          verification_status?: string
+          verifier_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "verification_logs_certificate_id_fkey"
+            columns: ["certificate_id"]
+            isOneToOne: false
+            referencedRelation: "digital_certificates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_certificate_number: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never
