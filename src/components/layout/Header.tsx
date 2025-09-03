@@ -35,13 +35,20 @@ const Header = () => {
   const isActive = (path: string) => location.pathname === path;
 
   const getDashboardPath = (role: string) => {
-    switch (role?.toLowerCase()) {
-      case 'admin': return '/dashboard/admin';
+    console.log('Dashboard role routing:', role);
+    const normalizedRole = role?.toLowerCase();
+    
+    switch (normalizedRole) {
+      case 'admin': 
+        return '/dashboard/admin';
       case 'qa_agency':
-      case 'qa': return '/dashboard/qa';
-      case 'importer': return '/dashboard/importer';
+      case 'qa': 
+        return '/dashboard/qa';
+      case 'importer': 
+        return '/dashboard/importer';
       case 'exporter':
-      default: return '/dashboard/exporter';
+      default: 
+        return '/dashboard/exporter';
     }
   };
 

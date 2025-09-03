@@ -1,10 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Calendar } from "@/components/ui/calendar";
 import { ParticleBackground } from "@/components/ui/particle-background";
+import InspectionModal from "@/components/ui/InspectionModal";
+import CertificateModal from "@/components/ui/CertificateModal";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 import { 
   Shield, 
   Calendar as CalendarIcon, 
@@ -14,49 +19,117 @@ import {
   CheckCircle,
   MapPin,
   User,
-  Building
+  Building,
+  Download,
+  Plus
 } from "lucide-react";
 
 const QADashboard = () => {
   const [activeTab, setActiveTab] = useState("pending");
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const [isInspectionModalOpen, setIsInspectionModalOpen] = useState(false);
+  const [isCertificateModalOpen, setIsCertificateModalOpen] = useState(false);
+  const [inspections, setInspections] = useState<any[]>([]);
+  const [certificates, setCertificates] = useState<any[]>([]);
+  const [stats, setStats] = useState({
+    pending: 0,
+    completed: 0,
+    scheduled: 0,
+    issued: 0
+  });
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+  const { user } = useAuth();
 
-  // Mock data
-  const stats = [
-    { title: "Pending Inspections", value: "12", color: "text-warning", bg: "bg-warning/10" },
-    { title: "Completed Today", value: "5", color: "text-success", bg: "bg-success/10" },
-    { title: "Scheduled This Week", value: "18", color: "text-secondary", bg: "bg-secondary/10" },
-    { title: "Certificates Issued", value: "342", color: "text-primary", bg: "bg-primary/10" }
-  ];
+  const fetchInspections = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('inspection_actions')
+        .select(`
+          *,
+          batches(
+            id, batch_number, product_name, origin_location,
+            profiles!batches_user_id_fkey(first_name, last_name, organization_name)
+          )
+        `)
+        .eq('inspector_id', user?.id)
+        .order('created_at', { ascending: false });
 
-  const pendingInspections = [
-    {
-      id: "AGR-2024-001",
-      exporter: "Green Valley Farms",
-      product: "Premium Organic Rice",
-      location: "Punjab, India",
-      scheduledDate: "2024-12-16",
-      priority: "high",
-      contact: "Rajesh Kumar"
-    },
-    {
-      id: "AGR-2024-002",
-      exporter: "Sunrise Agriculture",
-      product: "Basmati Rice Grade A",
-      location: "Haryana, India",
-      scheduledDate: "2024-12-17",
-      priority: "medium",
-      contact: "Priya Sharma"
-    },
-    {
-      id: "AGR-2024-003",
-      exporter: "Organic Harvest Co.",
-      product: "Quinoa Organic",
-      location: "Rajasthan, India",
-      scheduledDate: "2024-12-18",
-      priority: "low",
-      contact: "Amit Patel"
+      if (error) throw error;
+      setInspections(data || []);
+      
+      // Update stats
+      const pending = data?.filter(i => i.status === 'pending').length || 0;
+      const completed = data?.filter(i => i.status === 'completed').length || 0;
+      const scheduled = data?.filter(i => i.status === 'scheduled').length || 0;
+      
+      setStats(prev => ({ ...prev, pending, completed, scheduled }));
+    } catch (error: any) {
+      console.error('Error fetching inspections:', error);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const fetchCertificates = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('digital_certificates')
+        .select(`
+          *,
+          batches(batch_number, product_name),
+          profiles!digital_certificates_issued_to_fkey(first_name, last_name, organization_name)
+        `)
+        .eq('issued_by', user?.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setCertificates(data || []);
+      setStats(prev => ({ ...prev, issued: data?.length || 0 }));
+    } catch (error: any) {
+      console.error('Error fetching certificates:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (user) {
+      fetchInspections();
+      fetchCertificates();
+
+      // Set up real-time subscriptions
+      const inspectionsChannel = supabase
+        .channel('qa-inspections')
+        .on('postgres_changes', { 
+          event: '*', 
+          schema: 'public', 
+          table: 'inspection_actions',
+          filter: `inspector_id=eq.${user.id}`
+        }, fetchInspections)
+        .subscribe();
+
+      const certificatesChannel = supabase
+        .channel('qa-certificates')
+        .on('postgres_changes', { 
+          event: '*', 
+          schema: 'public', 
+          table: 'digital_certificates',
+          filter: `issued_by=eq.${user.id}`
+        }, fetchCertificates)
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(inspectionsChannel);
+        supabase.removeChannel(certificatesChannel);
+      };
+    }
+  }, [user]);
+
+  // Dynamic stats based on real data
+  const dynamicStats = [
+    { title: "Pending Inspections", value: stats.pending.toString(), color: "text-warning", bg: "bg-warning/10" },
+    { title: "Completed Today", value: stats.completed.toString(), color: "text-success", bg: "bg-success/10" },
+    { title: "Scheduled This Week", value: stats.scheduled.toString(), color: "text-secondary", bg: "bg-secondary/10" },
+    { title: "Certificates Issued", value: stats.issued.toString(), color: "text-primary", bg: "bg-primary/10" }
   ];
 
   const getPriorityColor = (priority: string) => {
@@ -79,11 +152,11 @@ const QADashboard = () => {
           <p className="text-muted-foreground mt-1">Manage inspections and issue quality certificates</p>
         </div>
         <div className="flex space-x-3">
-          <Button variant="outline" size="lg">
+          <Button variant="outline" size="lg" onClick={() => setIsInspectionModalOpen(true)}>
             <CalendarIcon className="h-5 w-5 mr-2" />
             Schedule Inspection
           </Button>
-          <Button variant="agri" size="lg">
+          <Button variant="agri" size="lg" onClick={() => setIsCertificateModalOpen(true)}>
             <FileCheck className="h-5 w-5 mr-2" />
             Issue Certificate
           </Button>
@@ -92,7 +165,7 @@ const QADashboard = () => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat, index) => (
+        {dynamicStats.map((stat, index) => (
           <Card key={index} className="hover-lift">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
@@ -131,48 +204,60 @@ const QADashboard = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {pendingInspections.map((inspection) => (
-                      <div key={inspection.id} className="border rounded-lg p-4 hover:bg-muted/50 transition-colors">
-                        <div className="flex items-center justify-between mb-3">
-                          <div className="flex items-center space-x-3">
-                            <Badge className={getPriorityColor(inspection.priority)}>
-                              {inspection.priority.toUpperCase()}
-                            </Badge>
-                            <span className="font-medium text-foreground">{inspection.id}</span>
-                          </div>
-                          <div className="flex space-x-2">
-                            <Button variant="outline" size="sm">
-                              <CalendarIcon className="h-4 w-4 mr-1" />
-                              Schedule
-                            </Button>
-                            <Button variant="agri" size="sm">
-                              <FileCheck className="h-4 w-4 mr-1" />
-                              Inspect
-                            </Button>
-                          </div>
-                        </div>
-                        
-                        <div className="grid md:grid-cols-2 gap-4 text-sm">
-                          <div className="space-y-2">
-                            <div className="flex items-center space-x-2">
-                              <Building className="h-4 w-4 text-muted-foreground" />
-                              <span className="font-medium">{inspection.exporter}</span>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <User className="h-4 w-4 text-muted-foreground" />
-                              <span>{inspection.contact}</span>
-                            </div>
-                          </div>
-                          <div className="space-y-2">
-                            <div className="font-medium text-foreground">{inspection.product}</div>
-                            <div className="flex items-center space-x-2 text-muted-foreground">
-                              <MapPin className="h-4 w-4" />
-                              <span>{inspection.location}</span>
-                            </div>
-                          </div>
-                        </div>
+                    {loading ? (
+                      <div className="text-center py-8">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+                        <p className="text-muted-foreground mt-2">Loading inspections...</p>
                       </div>
-                    ))}
+                    ) : inspections.filter(i => i.status === 'pending').length === 0 ? (
+                      <div className="text-center py-8 text-muted-foreground">
+                        <Clock className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                        <p>No pending inspections.</p>
+                      </div>
+                    ) : (
+                      inspections.filter(i => i.status === 'pending').map((inspection) => (
+                        <div key={inspection.id} className="border rounded-lg p-4 hover:bg-muted/50 transition-colors">
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center space-x-3">
+                              <Badge className={getPriorityColor(inspection.priority)}>
+                                {inspection.priority?.toUpperCase() || 'MEDIUM'}
+                              </Badge>
+                              <span className="font-medium text-foreground">{inspection.batches?.batch_number}</span>
+                            </div>
+                            <div className="flex space-x-2">
+                              <Button variant="outline" size="sm" onClick={() => setIsInspectionModalOpen(true)}>
+                                <CalendarIcon className="h-4 w-4 mr-1" />
+                                Schedule
+                              </Button>
+                              <Button variant="agri" size="sm" onClick={() => setIsInspectionModalOpen(true)}>
+                                <FileCheck className="h-4 w-4 mr-1" />
+                                Inspect
+                              </Button>
+                            </div>
+                          </div>
+                          
+                          <div className="grid md:grid-cols-2 gap-4 text-sm">
+                            <div className="space-y-2">
+                              <div className="flex items-center space-x-2">
+                                <Building className="h-4 w-4 text-muted-foreground" />
+                                <span className="font-medium">{inspection.batches?.profiles?.organization_name}</span>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <User className="h-4 w-4 text-muted-foreground" />
+                                <span>{inspection.contact_person || 'N/A'}</span>
+                              </div>
+                            </div>
+                            <div className="space-y-2">
+                              <div className="font-medium text-foreground">{inspection.batches?.product_name}</div>
+                              <div className="flex items-center space-x-2 text-muted-foreground">
+                                <MapPin className="h-4 w-4" />
+                                <span>{inspection.location || inspection.batches?.origin_location}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -185,9 +270,27 @@ const QADashboard = () => {
                   <CardDescription>Your upcoming inspection appointments</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-center py-8 text-muted-foreground">
-                    <CalendarIcon className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>No scheduled inspections for today.</p>
+                  <div className="space-y-4">
+                    {inspections.filter(i => i.status === 'scheduled').length === 0 ? (
+                      <div className="text-center py-8 text-muted-foreground">
+                        <CalendarIcon className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                        <p>No scheduled inspections for today.</p>
+                      </div>
+                    ) : (
+                      inspections.filter(i => i.status === 'scheduled').map((inspection) => (
+                        <div key={inspection.id} className="border rounded-lg p-4 hover:bg-muted/50 transition-colors">
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="font-medium">{inspection.batches?.batch_number}</div>
+                            <Badge className="bg-secondary text-secondary-foreground">Scheduled</Badge>
+                          </div>
+                          <p className="text-sm text-muted-foreground mb-2">{inspection.batches?.product_name}</p>
+                          <div className="flex items-center justify-between text-sm">
+                            <span>📍 {inspection.location}</span>
+                            <span>📅 {inspection.scheduled_date ? new Date(inspection.scheduled_date).toLocaleString() : 'TBD'}</span>
+                          </div>
+                        </div>
+                      ))
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -196,13 +299,47 @@ const QADashboard = () => {
             <TabsContent value="completed">
               <Card>
                 <CardHeader>
-                  <CardTitle>Completed Inspections</CardTitle>
-                  <CardDescription>Recently completed inspection reports</CardDescription>
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <CardTitle>Completed Inspections</CardTitle>
+                      <CardDescription>Recently completed inspection reports</CardDescription>
+                    </div>
+                    <Button variant="outline" size="sm" onClick={() => setIsCertificateModalOpen(true)}>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Issue Certificate
+                    </Button>
+                  </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-center py-8 text-muted-foreground">
-                    <CheckCircle className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>Completed inspections will appear here.</p>
+                  <div className="space-y-4">
+                    {inspections.filter(i => i.status === 'completed').length === 0 ? (
+                      <div className="text-center py-8 text-muted-foreground">
+                        <CheckCircle className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                        <p>Completed inspections will appear here.</p>
+                      </div>
+                    ) : (
+                      inspections.filter(i => i.status === 'completed').map((inspection) => (
+                        <div key={inspection.id} className="border rounded-lg p-4 hover:bg-muted/50 transition-colors">
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="font-medium">{inspection.batches?.batch_number}</div>
+                            <div className="flex items-center space-x-2">
+                              <Badge className="bg-success text-success-foreground">Completed</Badge>
+                              {!inspection.certificate_issued && (
+                                <Button variant="outline" size="sm" onClick={() => setIsCertificateModalOpen(true)}>
+                                  <Shield className="h-4 w-4 mr-1" />
+                                  Issue Cert
+                                </Button>
+                              )}
+                            </div>
+                          </div>
+                          <p className="text-sm text-muted-foreground mb-2">{inspection.batches?.product_name}</p>
+                          <div className="flex items-center justify-between text-sm">
+                            <span>Score: {inspection.quality_score || 'N/A'}</span>
+                            <span>Completed: {inspection.completed_date ? new Date(inspection.completed_date).toLocaleDateString() : 'N/A'}</span>
+                          </div>
+                        </div>
+                      ))
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -234,11 +371,11 @@ const QADashboard = () => {
               <CardTitle>Quick Actions</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <Button variant="outline" className="w-full justify-start">
+              <Button variant="outline" className="w-full justify-start" onClick={() => setIsInspectionModalOpen(true)}>
                 <FileCheck className="h-4 w-4 mr-2" />
                 Create Inspection Report
               </Button>
-              <Button variant="outline" className="w-full justify-start">
+              <Button variant="outline" className="w-full justify-start" onClick={() => setIsCertificateModalOpen(true)}>
                 <Shield className="h-4 w-4 mr-2" />
                 Issue Digital Certificate
               </Button>
@@ -247,8 +384,8 @@ const QADashboard = () => {
                 View Schedule
               </Button>
               <Button variant="outline" className="w-full justify-start">
-                <AlertTriangle className="h-4 w-4 mr-2" />
-                Report Issue
+                <Download className="h-4 w-4 mr-2" />
+                Download Reports
               </Button>
             </CardContent>
           </Card>
@@ -261,21 +398,35 @@ const QADashboard = () => {
             <CardContent className="space-y-3">
               <div className="flex justify-between items-center text-sm">
                 <span className="text-muted-foreground">Inspections Completed</span>
-                <span className="font-medium">5</span>
+                <span className="font-medium">{stats.completed}</span>
               </div>
               <div className="flex justify-between items-center text-sm">
                 <span className="text-muted-foreground">Certificates Issued</span>
-                <span className="font-medium">3</span>
+                <span className="font-medium">{stats.issued}</span>
               </div>
               <div className="flex justify-between items-center text-sm">
                 <span className="text-muted-foreground">Pending Reviews</span>
-                <span className="font-medium">2</span>
+                <span className="font-medium">{stats.pending}</span>
               </div>
             </CardContent>
           </Card>
         </div>
       </div>
       </div>
+
+      {/* Inspection Modal */}
+      <InspectionModal
+        open={isInspectionModalOpen}
+        onOpenChange={setIsInspectionModalOpen}
+        onInspectionCompleted={fetchInspections}
+      />
+
+      {/* Certificate Modal */}
+      <CertificateModal
+        open={isCertificateModalOpen}
+        onOpenChange={setIsCertificateModalOpen}
+        onCertificateIssued={fetchCertificates}
+      />
     </div>
   );
 };

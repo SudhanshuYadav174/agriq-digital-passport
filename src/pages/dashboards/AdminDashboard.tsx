@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { ParticleBackground } from "@/components/ui/particle-background";
 import AddUserModal from "@/components/ui/AddUserModal";
+import DeleteUserModal from "@/components/ui/DeleteUserModal";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { 
@@ -21,13 +22,23 @@ import {
   Search,
   Plus,
   Edit,
-  Trash2
+  Trash2,
+  Download
 } from "lucide-react";
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
+  const [isDeleteUserModalOpen, setIsDeleteUserModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<any>(null);
   const [users, setUsers] = useState<any[]>([]);
+  const [certificates, setCertificates] = useState<any[]>([]);
+  const [systemStats, setSystemStats] = useState({
+    totalUsers: 0,
+    activeCertificates: 0,
+    pendingApprovals: 0,
+    systemHealth: '99.9%'
+  });
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
@@ -40,6 +51,7 @@ const AdminDashboard = () => {
 
       if (error) throw error;
       setUsers(data || []);
+      setSystemStats(prev => ({ ...prev, totalUsers: data?.length || 0 }));
     } catch (error: any) {
       console.error('Error fetching users:', error);
     } finally {
@@ -47,16 +59,60 @@ const AdminDashboard = () => {
     }
   };
 
+  const fetchCertificates = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('digital_certificates')
+        .select(`
+          *,
+          batches(batch_number, product_name),
+          profiles!digital_certificates_issued_to_fkey(first_name, last_name, organization_name)
+        `)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setCertificates(data || []);
+      setSystemStats(prev => ({ 
+        ...prev, 
+        activeCertificates: data?.filter(cert => cert.status === 'valid').length || 0 
+      }));
+    } catch (error: any) {
+      console.error('Error fetching certificates:', error);
+    }
+  };
+
+  const handleDeleteUser = (user: any) => {
+    setSelectedUser(user);
+    setIsDeleteUserModalOpen(true);
+  };
+
   useEffect(() => {
     fetchUsers();
+    fetchCertificates();
+
+    // Set up real-time subscriptions
+    const usersChannel = supabase
+      .channel('admin-users')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, fetchUsers)
+      .subscribe();
+
+    const certificatesChannel = supabase
+      .channel('admin-certificates')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'digital_certificates' }, fetchCertificates)
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(usersChannel);
+      supabase.removeChannel(certificatesChannel);
+    };
   }, []);
 
-  // Mock data
-  const systemStats = [
-    { title: "Total Users", value: "2,547", change: "+12%", icon: Users, color: "text-primary" },
-    { title: "Active Certificates", value: "15,234", change: "+8%", icon: Shield, color: "text-success" },
+  // Dynamic system stats based on real data
+  const dynamicStats = [
+    { title: "Total Users", value: systemStats.totalUsers.toString(), change: "+12%", icon: Users, color: "text-primary" },
+    { title: "Active Certificates", value: systemStats.activeCertificates.toString(), change: "+8%", icon: Shield, color: "text-success" },
     { title: "Pending Approvals", value: "23", change: "-5%", icon: Clock, color: "text-warning" },
-    { title: "System Health", value: "99.9%", change: "0%", icon: Activity, color: "text-secondary" }
+    { title: "System Health", value: systemStats.systemHealth, change: "0%", icon: Activity, color: "text-secondary" }
   ];
 
   const recentUsers = [
@@ -116,7 +172,7 @@ const AdminDashboard = () => {
 
       {/* System Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {systemStats.map((stat, index) => {
+        {dynamicStats.map((stat, index) => {
           const Icon = stat.icon;
           return (
             <Card key={index} className="hover-lift">
@@ -283,7 +339,12 @@ const AdminDashboard = () => {
                         <Button variant="outline" size="sm">
                           <Edit className="h-4 w-4" />
                         </Button>
-                        <Button variant="outline" size="sm">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleDeleteUser(user)}
+                          className="text-destructive hover:text-destructive"
+                        >
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
@@ -299,13 +360,59 @@ const AdminDashboard = () => {
         <TabsContent value="certificates">
           <Card>
             <CardHeader>
-              <CardTitle>Certificate Management</CardTitle>
-              <CardDescription>Monitor and manage digital certificates</CardDescription>
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
+                <div>
+                  <CardTitle>Certificate Management</CardTitle>
+                  <CardDescription>Monitor and manage digital certificates</CardDescription>
+                </div>
+                <Button variant="outline" size="sm">
+                  <Download className="h-4 w-4 mr-2" />
+                  Export All
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-12 text-muted-foreground">
-                <FileText className="h-16 w-16 mx-auto mb-4 opacity-50" />
-                <p>Certificate management interface coming soon...</p>
+              <div className="space-y-4">
+                {certificates.length === 0 ? (
+                  <div className="text-center py-12 text-muted-foreground">
+                    <FileText className="h-16 w-16 mx-auto mb-4 opacity-50" />
+                    <p>No certificates found.</p>
+                  </div>
+                ) : (
+                  certificates.map((certificate) => (
+                    <div key={certificate.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors">
+                      <div className="flex items-center space-x-4">
+                        <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                          <Shield className="h-5 w-5 text-primary" />
+                        </div>
+                        <div>
+                          <div className="font-medium">{certificate.certificate_number}</div>
+                          <div className="text-sm text-muted-foreground">
+                            {certificate.batches?.product_name || 'Unknown Product'}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-4">
+                        <div className="text-right">
+                          <Badge className={certificate.status === 'valid' ? 'bg-success text-success-foreground' : 'bg-warning text-warning-foreground'}>
+                            {certificate.status}
+                          </Badge>
+                          <div className="text-sm text-muted-foreground mt-1">
+                            Expires: {new Date(certificate.expiry_date).toLocaleDateString()}
+                          </div>
+                        </div>
+                        <div className="flex space-x-2">
+                          <Button variant="outline" size="sm">
+                            <Download className="h-4 w-4" />
+                          </Button>
+                          <Button variant="outline" size="sm">
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             </CardContent>
           </Card>
@@ -363,6 +470,14 @@ const AdminDashboard = () => {
         open={isAddUserModalOpen}
         onOpenChange={setIsAddUserModalOpen}
         onUserAdded={fetchUsers}
+      />
+
+      {/* Delete User Modal */}
+      <DeleteUserModal
+        open={isDeleteUserModalOpen}
+        onOpenChange={setIsDeleteUserModalOpen}
+        user={selectedUser}
+        onUserDeleted={fetchUsers}
       />
     </div>
   );

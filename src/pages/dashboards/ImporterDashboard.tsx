@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -6,6 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ParticleBackground } from "@/components/ui/particle-background";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import { 
   QrCode, 
   Upload, 
@@ -23,6 +25,42 @@ const ImporterDashboard = () => {
   const [activeTab, setActiveTab] = useState("verify");
   const [qrInput, setQrInput] = useState("");
   const [verificationResult, setVerificationResult] = useState<any>(null);
+  const [verificationHistory, setVerificationHistory] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
+
+  const fetchVerificationHistory = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('verification_logs')
+        .select(`
+          *,
+          digital_certificates(
+            certificate_number, status, 
+            batches(batch_number, product_name)
+          )
+        `)
+        .order('created_at', { ascending: false })
+        .limit(20);
+
+      if (error) throw error;
+      setVerificationHistory(data || []);
+    } catch (error: any) {
+      console.error('Error fetching verification history:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchVerificationHistory();
+
+    // Real-time updates for verification logs
+    const channel = supabase
+      .channel('verification-logs')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'verification_logs' }, fetchVerificationHistory)
+      .subscribe();
+
+    return () => supabase.removeChannel(channel);
+  }, []);
 
   // Mock verification data
   const mockVerification = {
@@ -46,12 +84,74 @@ const ImporterDashboard = () => {
     { id: "AGR-2024-004", product: "Wheat Premium", status: "revoked", date: "2024-12-12", exporter: "Golden Fields Ltd" }
   ];
 
-  const handleVerification = () => {
-    if (qrInput) {
-      // Simulate verification process
-      setTimeout(() => {
-        setVerificationResult(mockVerification);
-      }, 1000);
+  const handleVerification = async () => {
+    if (!qrInput) return;
+    
+    setLoading(true);
+    try {
+      const { data: certificate, error } = await supabase
+        .from('digital_certificates')
+        .select(`
+          *,
+          batches(batch_number, product_name, origin_location),
+          profiles!digital_certificates_issued_to_fkey(organization_name)
+        `)
+        .eq('certificate_number', qrInput)
+        .single();
+
+      if (error || !certificate) {
+        setVerificationResult({ status: 'invalid' });
+        await logVerification(null, 'invalid');
+        toast({
+          title: "Certificate not found",
+          description: "The certificate ID you entered is not valid.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Check if certificate is still valid
+      const isValid = certificate.status === 'valid' && new Date(certificate.expiry_date) > new Date();
+      const status = isValid ? 'valid' : certificate.status === 'valid' ? 'expired' : certificate.status;
+
+      setVerificationResult({
+        ...certificate,
+        status,
+        product: certificate.batches?.product_name,
+        exporter: certificate.profiles?.organization_name,
+        country: certificate.batches?.origin_location
+      });
+
+      await logVerification(certificate.id, status);
+
+      toast({
+        title: isValid ? "Certificate verified!" : "Certificate invalid",
+        description: isValid ? "This certificate is valid and verified." : "This certificate is expired or revoked.",
+        variant: isValid ? "default" : "destructive"
+      });
+    } catch (error: any) {
+      console.error('Error verifying certificate:', error);
+      toast({
+        title: "Verification failed",
+        description: "Unable to verify certificate. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const logVerification = async (certificateId: string | null, status: string) => {
+    try {
+      await supabase.from('verification_logs').insert({
+        certificate_id: certificateId,
+        verification_method: 'manual_id',
+        verification_status: status,
+        ip_address: 'N/A', // Would be filled by edge function in production
+        user_agent: navigator.userAgent
+      });
+    } catch (error) {
+      console.error('Error logging verification:', error);
     }
   };
 
