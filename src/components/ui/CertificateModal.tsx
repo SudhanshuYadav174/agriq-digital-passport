@@ -216,7 +216,9 @@ const CertificateModal = ({ open, onOpenChange, inspectionId, onCertificateIssue
               </SelectTrigger>
               <SelectContent>
                 {inspections.length === 0 ? (
-                  <SelectItem value="" disabled>No completed inspections available</SelectItem>
+                  <div className="px-2 py-1.5 text-sm text-muted-foreground">
+                    No completed inspections available
+                  </div>
                 ) : (
                   inspections.map((inspection) => (
                     <SelectItem key={inspection.id} value={inspection.id}>
