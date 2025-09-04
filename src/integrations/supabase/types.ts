@@ -938,12 +938,28 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      user_roles_view: {
+        Row: {
+          created_at: string | null
+          email: string | null
+          first_name: string | null
+          id: string | null
+          last_name: string | null
+          metadata_role: string | null
+          organization_name: string | null
+          role: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       generate_certificate_number: {
         Args: Record<PropertyKey, never>
         Returns: string
+      }
+      update_user_role: {
+        Args: { new_role: string; user_email: string }
+        Returns: undefined
       }
     }
     Enums: {
