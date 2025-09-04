@@ -59,7 +59,9 @@ const ImporterDashboard = () => {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'verification_logs' }, fetchVerificationHistory)
       .subscribe();
 
-    return () => supabase.removeChannel(channel);
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   // Mock verification data
@@ -93,8 +95,7 @@ const ImporterDashboard = () => {
         .from('digital_certificates')
         .select(`
           *,
-          batches(batch_number, product_name, origin_location),
-          profiles!digital_certificates_issued_to_fkey(organization_name)
+          batches(batch_number, product_name, origin_location)
         `)
         .eq('certificate_number', qrInput)
         .single();
@@ -110,16 +111,30 @@ const ImporterDashboard = () => {
         return;
       }
 
+      // Fetch the profile information separately
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('organization_name')
+        .eq('user_id', certificate.issued_to)
+        .single();
+
       // Check if certificate is still valid
       const isValid = certificate.status === 'valid' && new Date(certificate.expiry_date) > new Date();
       const status = isValid ? 'valid' : certificate.status === 'valid' ? 'expired' : certificate.status;
 
+      const certificateData = certificate.certificate_data as any;
+      
       setVerificationResult({
         ...certificate,
         status,
         product: certificate.batches?.product_name,
-        exporter: certificate.profiles?.organization_name,
-        country: certificate.batches?.origin_location
+        exporter: profile?.organization_name || 'Unknown',
+        country: certificate.batches?.origin_location,
+        grade: certificateData?.quality_grade || 'N/A',
+        certificationDate: certificate.issue_date ? new Date(certificate.issue_date).toLocaleDateString() : 'N/A',
+        validUntil: certificate.expiry_date ? new Date(certificate.expiry_date).toLocaleDateString() : 'N/A',
+        qaAgency: 'QA Agency', // This would come from the issued_by profile
+        batchSize: certificateData?.batch_size || 'N/A'
       });
 
       await logVerification(certificate.id, status);
