@@ -123,28 +123,29 @@ const CertificateModal = ({ open, onOpenChange, inspectionId, onCertificateIssue
         status: 'valid',
         qr_code: qrCode,
         certificate_data: {
-          batch_number: inspection.batches.batch_number,
-          product_name: inspection.batches.product_name,
-          exporter: 'Export Organization', // Will be fetched separately
-          inspector: user.email,
-          quality_score: inspection.quality_score,
-          grade: formData.grade,
+          quality_grade: formData.grade,
           test_results: formData.test_results,
           special_conditions: formData.special_conditions,
-          inspection_date: inspection.completed_date,
-          location: inspection.location,
-          validity_period_days: parseInt(formData.validity_period)
-        }
+          validity_period_days: parseInt(formData.validity_period),
+          issued_date: new Date().toISOString(),
+          batch_number: inspection.batches.batch_number,
+          product_name: inspection.batches.product_name,
+          quality_score: inspection.quality_score,
+          inspection_date: inspection.completed_date
+        },
+        verification_url: qrCode
       };
 
-      // Insert certificate
-      const { error: certError } = await supabase
+      // Insert the certificate
+      const { data: certificate, error: certificateError } = await supabase
         .from('digital_certificates')
-        .insert([certificateData]);
+        .insert(certificateData)
+        .select()
+        .single();
 
-      if (certError) throw certError;
+      if (certificateError) throw certificateError;
 
-      // Update inspection as certificate issued
+      // Update inspection to mark certificate as issued
       const { error: updateError } = await supabase
         .from('inspection_actions')
         .update({ certificate_issued: true })
@@ -164,12 +165,14 @@ const CertificateModal = ({ open, onOpenChange, inspectionId, onCertificateIssue
       if (batchError) throw batchError;
 
       toast({
-        title: "Certificate issued successfully",
-        description: `Digital certificate ${certificateNumber} has been issued and is ready for download.`,
+        title: "Certificate issued successfully!",
+        description: `Certificate ${certificateNumber} has been created and is ready for download.`,
       });
 
       onCertificateIssued();
       onOpenChange(false);
+      
+      // Reset form
       setFormData({
         expiry_date: '',
         grade: 'A',
@@ -178,12 +181,13 @@ const CertificateModal = ({ open, onOpenChange, inspectionId, onCertificateIssue
         validity_period: '180'
       });
       setSelectedInspection('');
+
     } catch (error: any) {
       console.error('Error issuing certificate:', error);
       toast({
-        title: "Error issuing certificate",
-        description: error.message || "Failed to issue certificate. Please try again.",
-        variant: "destructive",
+        title: "Failed to issue certificate",
+        description: error.message || "There was an error creating the certificate.",
+        variant: "destructive"
       });
     } finally {
       setLoading(false);
@@ -211,14 +215,18 @@ const CertificateModal = ({ open, onOpenChange, inspectionId, onCertificateIssue
                 <SelectValue placeholder="Choose a completed inspection" />
               </SelectTrigger>
               <SelectContent>
-                {inspections.map((inspection) => (
-                  <SelectItem key={inspection.id} value={inspection.id}>
-                    {inspection.batches.batch_number} - {inspection.batches.product_name}
-                    <span className="text-xs text-muted-foreground ml-2">
-                      (Score: {inspection.quality_score || 'N/A'})
-                    </span>
-                  </SelectItem>
-                ))}
+                {inspections.length === 0 ? (
+                  <SelectItem value="" disabled>No completed inspections available</SelectItem>
+                ) : (
+                  inspections.map((inspection) => (
+                    <SelectItem key={inspection.id} value={inspection.id}>
+                      {inspection.batches.batch_number} - {inspection.batches.product_name}
+                      <span className="text-xs text-muted-foreground ml-2">
+                        (Score: {inspection.quality_score || 'N/A'})
+                      </span>
+                    </SelectItem>
+                  ))
+                )}
               </SelectContent>
             </Select>
           </div>

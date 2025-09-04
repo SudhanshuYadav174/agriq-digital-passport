@@ -19,9 +19,15 @@ const Header = () => {
   const [userProfile, setUserProfile] = useState<any>(null);
 
   useEffect(() => {
-    if (user) {
-      getUserProfile().then(setUserProfile);
-    }
+    const fetchUserProfile = async () => {
+      if (user) {
+        const profile = await getUserProfile();
+        console.log('User profile fetched:', profile);
+        console.log('User metadata:', user.user_metadata);
+        setUserProfile(profile);
+      }
+    };
+    fetchUserProfile();
   }, [user, getUserProfile]);
 
   useEffect(() => {
@@ -117,7 +123,7 @@ const Header = () => {
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem asChild>
                     <Link to={getDashboardPath(userProfile?.role || user.user_metadata?.role || 'exporter')}>
-                      Dashboard
+                      Dashboard ({userProfile?.role || user.user_metadata?.role || 'exporter'})
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={signOut} className="text-destructive">
