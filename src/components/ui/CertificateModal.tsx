@@ -81,41 +81,10 @@ const CertificateModal = ({ open, onOpenChange, inspectionId, onCertificateIssue
       if (error) throw error;
       setInspections(data || []);
       
-      if (data && data.length === 0) {
-        console.log('No completed inspections found. Creating sample data for testing...');
-        // Create a sample inspection for testing
-        const sampleInspection = {
-          id: 'sample-' + Date.now(),
-          status: 'completed',
-          certificate_issued: false,
-          quality_score: 85,
-          completed_date: new Date().toISOString(),
-          batches: {
-            id: 'sample-batch-' + Date.now(),
-            batch_number: 'BATCH-001',
-            product_name: 'Sample Product for Testing',
-            user_id: 'sample-user'
-          }
-        };
-        setInspections([sampleInspection]);
-      }
+      // Don't create sample data - let user know no inspections available
     } catch (error: any) {
       console.error('Error fetching inspections:', error);
-      // Set sample data for testing if there's an error
-      const sampleInspection = {
-        id: 'sample-' + Date.now(),
-        status: 'completed',
-        certificate_issued: false,
-        quality_score: 85,
-        completed_date: new Date().toISOString(),
-        batches: {
-          id: 'sample-batch-' + Date.now(),
-          batch_number: 'BATCH-001',
-          product_name: 'Sample Product for Testing',
-          user_id: 'sample-user'
-        }
-      };
-      setInspections([sampleInspection]);
+      // No sample data - show empty state
     }
   };
 
