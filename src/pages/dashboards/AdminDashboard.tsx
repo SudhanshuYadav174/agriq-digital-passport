@@ -98,7 +98,7 @@ const AdminDashboard = () => {
     fetchUsers();
     fetchCertificates();
 
-    // Set up real-time subscriptions
+    // Set up real-time subscriptions with proper cleanup
     const usersChannel = supabase
       .channel('admin-users')
       .on('postgres_changes', { 
@@ -106,8 +106,11 @@ const AdminDashboard = () => {
         schema: 'public', 
         table: 'profiles' 
       }, (payload) => {
-        console.log('Users table changed:', payload);
-        fetchUsers();
+        console.log('Users table changed:', payload.eventType, payload.new || payload.old);
+        // Debounce the fetch to prevent excessive calls
+        setTimeout(() => {
+          fetchUsers();
+        }, 100);
       })
       .subscribe();
 
@@ -118,8 +121,10 @@ const AdminDashboard = () => {
         schema: 'public', 
         table: 'digital_certificates' 
       }, (payload) => {
-        console.log('Certificates table changed:', payload);
-        fetchCertificates();
+        console.log('Certificates table changed:', payload.eventType);
+        setTimeout(() => {
+          fetchCertificates();
+        }, 100);
       })
       .subscribe();
 

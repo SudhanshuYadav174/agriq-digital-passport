@@ -7,26 +7,51 @@ export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState<any>(null);
   const { toast } = useToast();
 
   useEffect(() => {
+    let isMounted = true;
+
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
+        if (!isMounted) return;
+        
+        console.log('Auth state changed:', event, session?.user?.id);
         setSession(session);
         setUser(session?.user ?? null);
+        
+        // Clear profile when user logs out
+        if (!session?.user) {
+          setProfile(null);
+        }
+        
         setLoading(false);
       }
     );
 
     // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
+    const initializeAuth = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!isMounted) return;
+        
+        setSession(session);
+        setUser(session?.user ?? null);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error getting session:', error);
+        if (isMounted) setLoading(false);
+      }
+    };
 
-    return () => subscription.unsubscribe();
+    initializeAuth();
+
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signUp = async (email: string, password: string, userData: any) => {
@@ -102,6 +127,7 @@ export const useAuth = () => {
       // Clear state immediately
       setUser(null);
       setSession(null);
+      setProfile(null);
 
       toast({
         title: "Signed out",
@@ -122,6 +148,11 @@ export const useAuth = () => {
   const getUserProfile = async () => {
     if (!user) return null;
     
+    // Return cached profile if available
+    if (profile && profile.user_id === user.id) {
+      return profile;
+    }
+    
     try {
       const { data, error } = await supabase
         .from('profiles')
@@ -130,6 +161,9 @@ export const useAuth = () => {
         .single();
 
       if (error) throw error;
+      
+      // Cache the profile
+      setProfile(data);
       return data;
     } catch (error: any) {
       console.error('Error fetching profile:', error);
@@ -141,6 +175,7 @@ export const useAuth = () => {
     user,
     session,
     loading,
+    profile,
     signUp,
     signIn,
     signOut,

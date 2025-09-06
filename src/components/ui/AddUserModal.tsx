@@ -29,7 +29,9 @@ const AddUserModal = ({ open, onOpenChange, onUserAdded }: AddUserModalProps) =>
     setLoading(true);
 
     try {
-      // Use Supabase Edge Function to create user (admin operations need to be server-side)
+      console.log('Submitting form data:', formData);
+      
+      // Use edge function to create user (admin operations need to be server-side)
       const { data: result, error: functionError } = await supabase.functions.invoke('create-user', {
         body: {
           email: formData.email,
@@ -44,8 +46,21 @@ const AddUserModal = ({ open, onOpenChange, onUserAdded }: AddUserModalProps) =>
         }
       });
 
-      if (functionError) throw functionError;
-      if (result?.error) throw new Error(result.error);
+      console.log('Edge function result:', result);
+
+      if (functionError) {
+        console.error('Function error:', functionError);
+        throw functionError;
+      }
+      
+      if (result?.error) {
+        console.error('Result error:', result.error);
+        // Handle specific error codes
+        if (result.code === 'email_exists') {
+          throw new Error(`A user with email ${formData.email} already exists. Please use a different email address.`);
+        }
+        throw new Error(result.error);
+      }
 
       toast({
         title: "User added successfully",
@@ -63,9 +78,10 @@ const AddUserModal = ({ open, onOpenChange, onUserAdded }: AddUserModalProps) =>
       onUserAdded();
       onOpenChange(false);
     } catch (error: any) {
+      console.error('Add user error:', error);
       toast({
         title: "Error adding user",
-        description: error.message,
+        description: error.message || "Failed to add user. Please try again.",
         variant: "destructive",
       });
     } finally {

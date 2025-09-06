@@ -36,6 +36,34 @@ serve(async (req) => {
       address 
     } = await req.json()
 
+    console.log('Creating user with email:', email)
+
+    // Check if user already exists
+    const { data: existingUsers, error: checkError } = await supabaseClient.auth.admin.listUsers()
+    
+    if (checkError) {
+      console.error('Error checking existing users:', checkError)
+      throw checkError
+    }
+
+    // Check if email already exists
+    const emailExists = existingUsers.users.some(user => user.email === email)
+    
+    if (emailExists) {
+      console.log('User with email already exists:', email)
+      return new Response(
+        JSON.stringify({ 
+          error: `User with email ${email} already exists`,
+          success: false,
+          code: 'email_exists'
+        }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400,
+        },
+      )
+    }
+
     // Create user in auth
     const { data: authData, error: authError } = await supabaseClient.auth.admin.createUser({
       email,
@@ -49,8 +77,11 @@ serve(async (req) => {
     })
 
     if (authError) {
+      console.error('Auth creation error:', authError)
       throw authError
     }
+
+    console.log('User created in auth, creating profile...')
 
     // Create profile
     const { error: profileError } = await supabaseClient
@@ -61,23 +92,29 @@ serve(async (req) => {
         last_name,
         email,
         role,
-        organization_name,
-        organization_type,
-        country,
-        address,
+        organization_name: organization_name || `${first_name} ${last_name} Organization`,
+        organization_type: organization_type || role,
+        country: country || 'India',
+        address: address || 'Address not provided',
         status: 'active'
       })
 
     if (profileError) {
+      console.error('Profile creation error:', profileError)
       // If profile creation fails, delete the auth user
       await supabaseClient.auth.admin.deleteUser(authData.user.id)
       throw profileError
     }
 
+    console.log('User and profile created successfully')
+
     return new Response(
       JSON.stringify({ 
         success: true, 
-        user: authData.user,
+        user: {
+          id: authData.user.id,
+          email: authData.user.email
+        },
         message: `User ${first_name} ${last_name} created successfully` 
       }),
       {

@@ -29,6 +29,8 @@ const DeleteUserModal = ({ open, onOpenChange, user, onUserDeleted }: DeleteUser
     
     setLoading(true);
     try {
+      console.log('Deleting user:', user.user_id);
+      
       // Use edge function to delete user (admin operations need to be server-side)
       const { data: result, error: functionError } = await supabase.functions.invoke('delete-user', {
         body: {
@@ -36,8 +38,17 @@ const DeleteUserModal = ({ open, onOpenChange, user, onUserDeleted }: DeleteUser
         }
       });
 
-      if (functionError) throw functionError;
-      if (result?.error) throw new Error(result.error);
+      console.log('Delete function result:', result);
+
+      if (functionError) {
+        console.error('Function error:', functionError);
+        throw functionError;
+      }
+      
+      if (result?.error) {
+        console.error('Result error:', result.error);
+        throw new Error(result.error);
+      }
 
       toast({
         title: "User deleted successfully",
@@ -50,7 +61,7 @@ const DeleteUserModal = ({ open, onOpenChange, user, onUserDeleted }: DeleteUser
       console.error('Delete user error:', error);
       toast({
         title: "Error deleting user",
-        description: error.message || "Failed to delete user",
+        description: error.message || "Failed to delete user. Please try again.",
         variant: "destructive",
       });
     } finally {
