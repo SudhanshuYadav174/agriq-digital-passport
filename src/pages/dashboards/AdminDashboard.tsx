@@ -44,16 +44,24 @@ const AdminDashboard = () => {
 
   const fetchUsers = async () => {
     try {
+      console.log('Fetching users...');
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
+      
+      console.log('Users fetched:', data?.length);
       setUsers(data || []);
       setSystemStats(prev => ({ ...prev, totalUsers: data?.length || 0 }));
     } catch (error: any) {
       console.error('Error fetching users:', error);
+      toast({
+        title: "Error loading users",
+        description: error.message,
+        variant: "destructive"
+      });
     } finally {
       setLoading(false);
     }
@@ -93,12 +101,26 @@ const AdminDashboard = () => {
     // Set up real-time subscriptions
     const usersChannel = supabase
       .channel('admin-users')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, fetchUsers)
+      .on('postgres_changes', { 
+        event: '*', 
+        schema: 'public', 
+        table: 'profiles' 
+      }, (payload) => {
+        console.log('Users table changed:', payload);
+        fetchUsers();
+      })
       .subscribe();
 
     const certificatesChannel = supabase
       .channel('admin-certificates')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'digital_certificates' }, fetchCertificates)
+      .on('postgres_changes', { 
+        event: '*', 
+        schema: 'public', 
+        table: 'digital_certificates' 
+      }, (payload) => {
+        console.log('Certificates table changed:', payload);
+        fetchCertificates();
+      })
       .subscribe();
 
     return () => {

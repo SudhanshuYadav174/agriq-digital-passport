@@ -25,28 +25,32 @@ const DeleteUserModal = ({ open, onOpenChange, user, onUserDeleted }: DeleteUser
   const { toast } = useToast();
 
   const handleDelete = async () => {
+    if (!user) return;
+    
     setLoading(true);
     try {
-      // Delete from profiles table (this will cascade to related data)
-      const { error } = await supabase
-        .from('profiles')
-        .delete()
-        .eq('user_id', user.user_id);
+      // Use edge function to delete user (admin operations need to be server-side)
+      const { data: result, error: functionError } = await supabase.functions.invoke('delete-user', {
+        body: {
+          user_id: user.user_id
+        }
+      });
 
-      if (error) throw error;
+      if (functionError) throw functionError;
+      if (result?.error) throw new Error(result.error);
 
       toast({
         title: "User deleted successfully",
-        description: `${user.first_name} ${user.last_name} has been removed from the system.`,
+        description: `${user.first_name} ${user.last_name} has been removed from the system`,
       });
 
       onUserDeleted();
       onOpenChange(false);
     } catch (error: any) {
-      console.error('Error deleting user:', error);
+      console.error('Delete user error:', error);
       toast({
         title: "Error deleting user",
-        description: error.message || "Failed to delete user. Please try again.",
+        description: error.message || "Failed to delete user",
         variant: "destructive",
       });
     } finally {

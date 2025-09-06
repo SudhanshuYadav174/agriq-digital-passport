@@ -197,7 +197,7 @@ const CertificateModal = ({ open, onOpenChange, inspectionId, onCertificateIssue
         .from('batches')
         .update({ 
           status: 'certified',
-          certificate_id: certificateNumber
+          certificate_id: certificate.id  // Use the UUID from certificate, not the certificate number
         })
         .eq('id', inspection.batch_id);
 

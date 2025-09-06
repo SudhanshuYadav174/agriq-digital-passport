@@ -29,36 +29,23 @@ const AddUserModal = ({ open, onOpenChange, onUserAdded }: AddUserModalProps) =>
     setLoading(true);
 
     try {
-      // Create user in Supabase Auth
-      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-        email: formData.email,
-        password: formData.password,
-        email_confirm: true,
-        user_metadata: {
-          first_name: formData.firstName,
-          last_name: formData.lastName,
-          role: formData.role
-        }
-      });
-
-      if (authError) throw authError;
-
-      // Create profile entry
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .insert({
-          user_id: authData.user.id,
+      // Use Supabase Edge Function to create user (admin operations need to be server-side)
+      const { data: result, error: functionError } = await supabase.functions.invoke('create-user', {
+        body: {
+          email: formData.email,
+          password: formData.password,
           first_name: formData.firstName,
           last_name: formData.lastName,
           role: formData.role,
-          email: formData.email,
           organization_name: `${formData.firstName} ${formData.lastName} Organization`,
           organization_type: formData.role,
           country: 'India',
           address: 'Address not provided'
-        });
+        }
+      });
 
-      if (profileError) throw profileError;
+      if (functionError) throw functionError;
+      if (result?.error) throw new Error(result.error);
 
       toast({
         title: "User added successfully",
@@ -148,7 +135,7 @@ const AddUserModal = ({ open, onOpenChange, onUserAdded }: AddUserModalProps) =>
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="exporter">Exporter</SelectItem>
-                  <SelectItem value="qa">QA Agency</SelectItem>
+                  <SelectItem value="qa_agency">QA Agency</SelectItem>
                   <SelectItem value="importer">Importer</SelectItem>
                   <SelectItem value="admin">Admin</SelectItem>
                 </SelectContent>
