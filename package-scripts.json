@@ -1,0 +1,11 @@
+{
+  "scripts": {
+    "deploy:ic:local": "chmod +x scripts/deploy-ic.sh && ./scripts/deploy-ic.sh local",
+    "deploy:ic:mainnet": "chmod +x scripts/deploy-ic.sh && ./scripts/deploy-ic.sh ic", 
+    "seed:ic": "tsx scripts/seed-ic.ts",
+    "verify:ic": "tsx scripts/verify-ic.ts",
+    "ic:start": "dfx start --background",
+    "ic:stop": "dfx stop",
+    "ic:clean": "dfx start --background --clean"
+  }
+}

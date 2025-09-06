@@ -11,6 +11,9 @@
         "preview": "vite preview"
     },
     "dependencies": {
+        "@dfinity/agent": "^3.2.4",
+        "@dfinity/candid": "^3.2.4",
+        "@dfinity/principal": "^3.2.4",
         "@hookform/resolvers": "^3.10.0",
         "@radix-ui/react-accordion": "^1.2.11",
         "@radix-ui/react-alert-dialog": "^1.1.14",
@@ -64,6 +67,7 @@
         "tailwind-merge": "^2.6.0",
         "tailwindcss-animate": "^1.0.7",
         "three": "^0.169.0",
+        "tsx": "^4.20.5",
         "vaul": "^0.9.9",
         "zod": "^3.25.76"
     },
