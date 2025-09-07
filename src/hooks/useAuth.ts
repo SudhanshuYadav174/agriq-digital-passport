@@ -227,19 +227,35 @@ export const useAuth = () => {
 
         console.log('Auth state changed:', event, session?.user?.id);
 
+        // Always update session and user state
         setSession(session);
         setUser(session?.user ?? null);
 
         if (!session?.user) {
+          // Clear all state when signing out
           setProfile(null);
           setLoading(false);
           return;
         }
 
-        // Fetch user profile after login
-        const userProfile = await fetchUserProfile(session.user.id);
-        if (isMounted) {
-          setProfile(userProfile);
+        // Only fetch profile for authenticated users
+        if (session?.user && event !== 'TOKEN_REFRESHED') {
+          // Defer profile fetching to avoid recursive calls
+          setTimeout(async () => {
+            if (!isMounted) return;
+            try {
+              const userProfile = await fetchUserProfile(session.user.id);
+              if (isMounted) {
+                setProfile(userProfile);
+              }
+            } catch (error) {
+              console.error('Error fetching profile after auth change:', error);
+            }
+            if (isMounted) {
+              setLoading(false);
+            }
+          }, 0);
+        } else {
           setLoading(false);
         }
       }
@@ -347,25 +363,37 @@ export const useAuth = () => {
 
   const signOut = async () => {
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-
+      // Clear state immediately BEFORE calling Supabase signOut
       setUser(null);
       setSession(null);
       setProfile(null);
+
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
 
       toast({
         title: "Signed out",
         description: "You have been successfully signed out.",
       });
 
+      // Redirect to home page
       window.location.href = '/';
     } catch (error: any) {
+      console.error('Sign out error:', error);
+      
+      // Even if there's an error, clear local state and redirect
+      setUser(null);
+      setSession(null);
+      setProfile(null);
+      
       toast({
         title: "Sign out failed",
         description: error.message,
         variant: "destructive",
       });
+      
+      // Force redirect anyway
+      window.location.href = '/';
     }
   };
 

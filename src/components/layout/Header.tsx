@@ -25,6 +25,9 @@ const Header = () => {
         console.log('User profile fetched:', profile);
         console.log('User metadata:', user.user_metadata);
         setUserProfile(profile);
+      } else {
+        // Clear user profile when user is null
+        setUserProfile(null);
       }
     };
     fetchUserProfile();
