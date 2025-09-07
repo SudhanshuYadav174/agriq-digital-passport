@@ -7,7 +7,7 @@ interface AuthGuardProps {
   redirectTo?: string;
 }
 
-const AuthGuard = ({ children, redirectTo = "/signup" }: AuthGuardProps) => {
+const AuthGuard = ({ children, redirectTo = "/login" }: AuthGuardProps) => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
 

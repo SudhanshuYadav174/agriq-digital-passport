@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -41,6 +41,7 @@ const Login = () => {
   const [selectedRole, setSelectedRole] = useState<keyof typeof roleConfigs>("exporter");
   const { user, signIn, loading, getUserProfile } = useAuth();
   const navigate = useNavigate();
+  const hasRedirected = useRef(false); // Prevent multiple redirects
   const [formData, setFormData] = useState({
     email: "",
     password: ""
@@ -59,26 +60,34 @@ const Login = () => {
     const { data, error } = await signIn(formData.email, formData.password, selectedRole);
     
     if (data && !error) {
-      // Redirect based on role mapping
-      const roleMapping = {
-        'exporter': 'exporter',
-        'qa_agency': 'qa', 
-        'importer': 'importer',
-        'admin': 'admin'
-      };
-      const dashboardRoute = roleMapping[selectedRole as keyof typeof roleMapping] || 'exporter';
-      navigate(`/dashboard/${dashboardRoute}`);
-    } else if (error) {
-      // Error is already handled in useAuth hook with toast
-      console.error("Login failed:", error.message);
+      // Wait for profile to be set, then redirect based on actual user role
+      try {
+        const profile = await getUserProfile();
+        if (profile?.role) {
+          const roleMapping = {
+            'exporter': 'exporter',
+            'qa_agency': 'qa',
+            'importer': 'importer',
+            'admin': 'admin'
+          };
+          const dashboardRoute = roleMapping[profile.role as keyof typeof roleMapping] || 'exporter';
+          navigate(`/dashboard/${dashboardRoute}`);
+        } else {
+          navigate('/dashboard/exporter'); // fallback
+        }
+      } catch (profileError) {
+        console.error('Error getting profile after login:', profileError);
+        navigate('/dashboard/exporter'); // fallback
+      }
     }
   };
 
-  // Redirect if already logged in
+  // Only redirect if user is already logged in when component first mounts
   useEffect(() => {
-    if (user && !loading) {
+    if (user && !loading && !hasRedirected.current) {
+      hasRedirected.current = true; // Prevent future redirects
       console.log('User already logged in, redirecting to dashboard');
-      // Get user's actual role from profile and redirect appropriately
+      
       const getUserRoleAndRedirect = async () => {
         try {
           const profile = await getUserProfile();
@@ -90,18 +99,19 @@ const Login = () => {
               'admin': 'admin'
             };
             const dashboardRoute = roleMapping[profile.role as keyof typeof roleMapping] || 'exporter';
-            navigate(`/dashboard/${dashboardRoute}`);
+            navigate(`/dashboard/${dashboardRoute}`, { replace: true });
           } else {
-            navigate('/dashboard/exporter'); // fallback
+            navigate('/dashboard/exporter', { replace: true });
           }
         } catch (error) {
           console.error('Error getting profile:', error);
-          navigate('/dashboard/exporter'); // fallback
+          navigate('/dashboard/exporter', { replace: true });
         }
       };
+      
       getUserRoleAndRedirect();
     }
-  }, [user, loading, navigate, getUserProfile]);
+  }, [user, loading, getUserProfile, navigate]);
 
   const currentRoleConfig = roleConfigs[selectedRole];
   const RoleIcon = currentRoleConfig.icon;
