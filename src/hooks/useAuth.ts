@@ -321,10 +321,10 @@ export const useAuth = () => {
 
       if (error) throw error;
 
-      // Check if user has expected role if provided
+      // Fetch user profile to check role
       if (expectedRole && data.user) {
-        const userRole = data.user.user_metadata?.role;
-        if (userRole && userRole !== expectedRole) {
+        const userProfile = await fetchUserProfile(data.user.id);
+        if (userProfile && userProfile.role !== expectedRole) {
           await supabase.auth.signOut();
           throw new Error(`Account does not exist for the selected role (${expectedRole}). Please check your credentials or register for this role.`);
         }

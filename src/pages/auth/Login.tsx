@@ -39,7 +39,7 @@ const roleConfigs = {
 
 const Login = () => {
   const [selectedRole, setSelectedRole] = useState<keyof typeof roleConfigs>("exporter");
-  const { user, signIn } = useAuth();
+  const { user, signIn, loading } = useAuth();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
@@ -59,8 +59,15 @@ const Login = () => {
     const { data, error } = await signIn(formData.email, formData.password, selectedRole);
     
     if (data && !error) {
-      // Redirect based on role
-      navigate(`/dashboard/${selectedRole}`);
+      // Redirect based on role mapping
+      const roleMapping = {
+        'exporter': 'exporter',
+        'qa_agency': 'qa', 
+        'importer': 'importer',
+        'admin': 'admin'
+      };
+      const dashboardRoute = roleMapping[selectedRole as keyof typeof roleMapping] || 'exporter';
+      navigate(`/dashboard/${dashboardRoute}`);
     } else if (error) {
       // Error is already handled in useAuth hook with toast
       console.error("Login failed:", error.message);
@@ -69,10 +76,11 @@ const Login = () => {
 
   // Redirect if already logged in
   useEffect(() => {
-    if (user) {
+    if (user && !loading) {
+      console.log('User already logged in, redirecting to dashboard');
       navigate('/');
     }
-  }, [user, navigate]);
+  }, [user, loading, navigate]);
 
   const currentRoleConfig = roleConfigs[selectedRole];
   const RoleIcon = currentRoleConfig.icon;

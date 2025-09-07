@@ -16,10 +16,10 @@ const HeroTrialButton = () => {
     }
   }, [user, getUserProfile]);
 
-  if (user) {
-    const role = userProfile?.role || user.user_metadata?.role;
+  if (user && userProfile) {
+    const role = userProfile?.role;
     const dashboardPath = role === 'admin' ? '/dashboard/admin' : 
-                         role === 'qa' ? '/dashboard/qa' : 
+                         role === 'qa_agency' ? '/dashboard/qa' : 
                          role === 'importer' ? '/dashboard/importer' : 
                          '/dashboard/exporter';
     

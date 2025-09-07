@@ -181,26 +181,49 @@ const Header = () => {
                   <ThemeToggle />
                 </div>
                 <div className="space-y-2">
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="w-full justify-start"
-                    asChild
-                  >
-                    <Link to="/login" onClick={() => setIsMenuOpen(false)}>
-                      Sign In
-                    </Link>
-                  </Button>
-                  <Button 
-                    variant="agri" 
-                    size="sm" 
-                    className="w-full"
-                    asChild
-                  >
-                    <Link to="/signup" onClick={() => setIsMenuOpen(false)}>
-                      Get Started
-                    </Link>
-                  </Button>
+                  {user ? (
+                    <>
+                      <Link 
+                        to={getDashboardPath(userProfile?.role || user.user_metadata?.role || 'exporter')}
+                        className="block px-3 py-2 rounded-md text-base font-medium text-muted-foreground hover:text-foreground hover:bg-accent"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        Dashboard ({userProfile?.role || user.user_metadata?.role || 'exporter'})
+                      </Link>
+                      <button 
+                        onClick={() => {
+                          signOut();
+                          setIsMenuOpen(false);
+                        }}
+                        className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-destructive hover:bg-destructive/10"
+                      >
+                        Sign Out
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="w-full justify-start"
+                        asChild
+                      >
+                        <Link to="/login" onClick={() => setIsMenuOpen(false)}>
+                          Sign In
+                        </Link>
+                      </Button>
+                      <Button 
+                        variant="agri" 
+                        size="sm" 
+                        className="w-full"
+                        asChild
+                      >
+                        <Link to="/signup" onClick={() => setIsMenuOpen(false)}>
+                          Get Started
+                        </Link>
+                      </Button>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
