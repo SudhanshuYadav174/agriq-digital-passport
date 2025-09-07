@@ -321,20 +321,13 @@ export const useAuth = () => {
 
       if (error) throw error;
 
-      // Fetch user profile to check role
-      if (expectedRole && data.user) {
-        const userProfile = await fetchUserProfile(data.user.id);
-        if (userProfile && userProfile.role !== expectedRole) {
-          await supabase.auth.signOut();
-          throw new Error(`Account does not exist for the selected role (${expectedRole}). Please check your credentials or register for this role.`);
-        }
-      }
-
-      // Fetch user profile after login to set role/state
-      if (data.user?.id) {
+      // Fetch user profile to check role - but allow login regardless of role selection
+      // The redirect will happen based on actual user role, not expected role
+      if (data.user) {
         const userProfile = await fetchUserProfile(data.user.id);
         setProfile(userProfile);
       }
+
 
       toast({
         title: "Welcome back!",

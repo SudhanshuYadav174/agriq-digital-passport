@@ -39,7 +39,7 @@ const roleConfigs = {
 
 const Login = () => {
   const [selectedRole, setSelectedRole] = useState<keyof typeof roleConfigs>("exporter");
-  const { user, signIn, loading } = useAuth();
+  const { user, signIn, loading, getUserProfile } = useAuth();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
@@ -78,9 +78,30 @@ const Login = () => {
   useEffect(() => {
     if (user && !loading) {
       console.log('User already logged in, redirecting to dashboard');
-      navigate('/');
+      // Get user's actual role from profile and redirect appropriately
+      const getUserRoleAndRedirect = async () => {
+        try {
+          const profile = await getUserProfile();
+          if (profile?.role) {
+            const roleMapping = {
+              'exporter': 'exporter',
+              'qa_agency': 'qa',
+              'importer': 'importer', 
+              'admin': 'admin'
+            };
+            const dashboardRoute = roleMapping[profile.role as keyof typeof roleMapping] || 'exporter';
+            navigate(`/dashboard/${dashboardRoute}`);
+          } else {
+            navigate('/dashboard/exporter'); // fallback
+          }
+        } catch (error) {
+          console.error('Error getting profile:', error);
+          navigate('/dashboard/exporter'); // fallback
+        }
+      };
+      getUserRoleAndRedirect();
     }
-  }, [user, loading, navigate]);
+  }, [user, loading, navigate, getUserProfile]);
 
   const currentRoleConfig = roleConfigs[selectedRole];
   const RoleIcon = currentRoleConfig.icon;
